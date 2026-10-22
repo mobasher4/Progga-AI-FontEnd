@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+/* ── Progga design tokens ─────────────────────────────────
+   Playful palette (grape + banana + mint) on a warm cream canvas.
+   Sleek comes from restraint: soft shadows, generous radius, calm spacing. */
+@theme {
+  --color-grape-50: #f4f1ff;
+  --color-grape-100: #e8e2ff;
+  --color-grape-200: #d2c6ff;
+  --color-grape-300: #b19cff;
+  --color-grape-400: #8f70fb;
+  --color-grape-500: #6c4cf1;
+  --color-grape-600: #5a39db;
+  --color-grape-700: #4a2db8;
+  --color-grape-800: #3b2592;
+  --color-grape-900: #2b1c6b;
+
+  --color-banana-50: #fffbea;
+  --color-banana-100: #fff3c4;
+  --color-banana-200: #ffe88a;
+  --color-banana-300: #ffdd55;
+  --color-banana-400: #ffd43b;
+  --color-banana-500: #f5b700;
+  --color-banana-600: #d99a00;
+  --color-banana-700: #a87400;
+
+  --color-mint-50: #ecfdf7;
+  --color-mint-100: #d5fbee;
+  --color-mint-300: #7cf5d4;
+  --color-mint-400: #3de3b0;
+  --color-mint-500: #22c493;
+  --color-mint-600: #17a079;
+  --color-mint-700: #0f7a5c;
+
+  --color-sky-50: #eff8ff;
+  --color-sky-100: #ddf1ff;
+  --color-sky-400: #5bb8ff;
+  --color-sky-500: #3ba7ff;
+  --color-sky-600: #1e88e5;
+
+  --color-coral-50: #fff4f4;
+  --color-coral-100: #ffe3e3;
+  --color-coral-400: #ff8585;
+  --color-coral-500: #ff6b6b;
+  --color-coral-600: #e5484d;
+
+  --color-ink: #1e1b3a;
+  --color-ink-soft: #4b4870;
+  --color-ink-muted: #8a87a8;
+  --color-line: #ece8f6;
+  --color-cream: #fffbf2;
+
+  --font-display: var(--font-baloo), "Hind Siliguri", ui-rounded, system-ui, sans-serif;
+  --font-sans: var(--font-nunito), var(--font-hind), ui-rounded, system-ui, sans-serif;
+
+  --shadow-soft: 0 1px 2px rgb(30 27 58 / 0.04), 0 8px 24px -8px rgb(30 27 58 / 0.1);
+  --shadow-lift: 0 2px 4px rgb(30 27 58 / 0.05), 0 18px 40px -12px rgb(76 45 184 / 0.25);
+
+  --animate-float: float 4s ease-in-out infinite;
+  --animate-wiggle: wiggle 0.5s ease-in-out;
+  --animate-pop: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0); }
+    25% { transform: rotate(-6deg); }
+    75% { transform: rotate(6deg); }
+  }
+  @keyframes pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-cream text-ink font-sans antialiased;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight;
+  }
+  ::selection {
+    @apply bg-banana-300 text-ink;
+  }
+  :focus-visible {
+    @apply outline-none ring-4 ring-grape-300/60 rounded-xl;
+  }
+}
+
+/* Chunky, tactile "3D" buttons — playful but tidy */
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 font-display text-[1.05rem] font-bold leading-none
+    transition-all duration-150 select-none disabled:opacity-50 disabled:pointer-events-none active:translate-y-[3px];
+}
+@utility btn-primary {
+  @apply btn bg-grape-500 text-white shadow-[0_4px_0_0_var(--color-grape-700)] hover:bg-grape-400 active:shadow-[0_1px_0_0_var(--color-grape-700)];
+}
+@utility btn-banana {
+  @apply btn bg-banana-400 text-ink shadow-[0_4px_0_0_var(--color-banana-600)] hover:bg-banana-300 active:shadow-[0_1px_0_0_var(--color-banana-600)];
+}
+@utility btn-mint {
+  @apply btn bg-mint-500 text-white shadow-[0_4px_0_0_var(--color-mint-700)] hover:bg-mint-400 active:shadow-[0_1px_0_0_var(--color-mint-700)];
+}
+@utility btn-ghost {
+  @apply btn bg-white text-ink border-2 border-line shadow-[0_3px_0_0_var(--color-line)] hover:border-grape-200 hover:bg-grape-50 active:shadow-none;
+}
+@utility btn-sm {
+  @apply px-3.5 py-2 text-sm rounded-xl;
+}
+@utility card {
+  @apply rounded-3xl bg-white border border-line shadow-soft;
+}
+@utility chip {
+  @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-bold border-2 transition-colors;
+}
+@utility input {
+  @apply w-full rounded-2xl border-2 border-line bg-white px-4 py-3 text-base text-ink placeholder:text-ink-muted/80
+    transition-colors focus:border-grape-400 focus:outline-none focus:ring-4 focus:ring-grape-100;
+}
+@utility label {
+  @apply mb-1.5 block text-sm font-bold text-ink-soft;
+}
+@utility eyebrow {
+  @apply text-xs font-extrabold uppercase tracking-[0.14em] text-grape-500;
+}
+
+/* Chat markdown */
+.prose-chat p { @apply leading-relaxed; }
+.prose-chat p + p { @apply mt-2; }
+.prose-chat ul { @apply mt-1 list-disc space-y-1 pl-5; }
+.prose-chat ol { @apply mt-1 list-decimal space-y-1 pl-5; }
+.prose-chat strong { @apply font-extrabold; }
+.prose-chat code { @apply rounded-md bg-grape-50 px-1.5 py-0.5 text-[0.9em] text-grape-700; }
+.prose-chat .katex { font-size: 1.08em; }
+.prose-chat .katex-display { @apply my-2 overflow-x-auto overflow-y-hidden py-1; }
+
+/* Subtle dotted canvas used on hero / tutor backgrounds */
+.bg-dots {
+  background-image: radial-gradient(rgb(108 76 241 / 0.12) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
