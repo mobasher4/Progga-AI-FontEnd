@@ -98,7 +98,7 @@ export interface TutorStep {
   hintsTotal: number;
 }
 
-export type MsgKind = "text" | "question" | "hint" | "feedback" | "why" | "celebrate" | "recap" | "reveal" | "safety" | "answer";
+export type MsgKind = "text" | "question" | "hint" | "teach" | "feedback" | "why" | "celebrate" | "recap" | "reveal" | "safety" | "answer";
 export type TutorMode = "problem" | "concept" | "fact";
 
 export interface TutorMessage {

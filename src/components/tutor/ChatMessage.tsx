@@ -2,10 +2,12 @@
 
 import clsx from "clsx";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { Markdown } from "@/components/ui/Markdown";
 import { ProggaMark } from "@/components/brand/Logo";
+import { VideoThumb } from "@/components/tutor/RelatedVideos";
 import { useT, type TKey } from "@/i18n";
-import type { TutorMessage } from "@/lib/types";
+import type { LessonCard, TutorMessage } from "@/lib/types";
 
 type Style = { box: string; label?: TKey; labelCls?: string };
 
@@ -13,6 +15,7 @@ const KIND_STYLE: Record<string, Style> = {
   text: { box: "bg-white border border-line" },
   question: { box: "bg-banana-50 border-2 border-banana-300", label: "chat.yourTurn", labelCls: "text-banana-700" },
   hint: { box: "bg-sky-50 border-2 border-sky-100", label: "chat.hint", labelCls: "text-sky-600" },
+  teach: { box: "bg-white border-2 border-sky-200", label: "chat.teach", labelCls: "text-sky-600" },
   why: { box: "bg-mint-50 border-2 border-mint-100", label: "chat.why", labelCls: "text-mint-700" },
   reveal: { box: "bg-grape-50 border-2 border-grape-100", label: "chat.reveal", labelCls: "text-grape-600" },
   recap: { box: "bg-white border-2 border-grape-100", label: "chat.recap", labelCls: "text-grape-600" },
@@ -24,6 +27,33 @@ function feedbackStyle(verdict: unknown): Style {
   if (verdict === "partial") return { box: "bg-banana-50 border-2 border-banana-200", label: "chat.partial", labelCls: "text-banana-700" };
   if (verdict === "incorrect") return { box: "bg-coral-50 border-2 border-coral-100", label: "chat.incorrect", labelCls: "text-coral-600" };
   return { box: "bg-white border border-line" };
+}
+
+/** Our recorded lessons on the topic, offered when Progga explains a step. */
+function VideoSuggestions({ videos }: { videos: LessonCard[] }) {
+  const { t } = useT();
+  return (
+    <div className="mt-3 border-t border-line pt-3">
+      <p className="mb-2 text-xs font-extrabold uppercase tracking-wider text-coral-600">{t("chat.videos")}</p>
+      <div className="grid gap-2.5 sm:grid-cols-2">
+        {videos.map((v) => (
+          <Link
+            key={v.id}
+            href={`/lessons/${v.id}`}
+            target="_blank"
+            className="group flex items-center gap-3 rounded-2xl border border-line bg-cream/60 p-2 transition-all hover:-translate-y-0.5 hover:border-grape-200 hover:shadow-soft"
+          >
+            <VideoThumb v={v} />
+            <span className="min-w-0">
+              <span className="line-clamp-2 font-display text-sm font-bold leading-snug">{v.title}</span>
+              <span className="mt-0.5 block truncate text-xs font-semibold text-ink-muted">{t("cards.lessonMeta", { n: v.grade, chapter: v.chapter })}</span>
+              <span className="mt-0.5 block text-xs font-extrabold text-grape-500">▶ {t("chat.watch")}</span>
+            </span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 /** Quick answer for factual questions: the answer first, then more to know. */
@@ -146,6 +176,7 @@ export function ChatMessage({ m, compact = false, onExplore }: { m: TutorMessage
       <div className={clsx("max-w-[88%] rounded-3xl rounded-bl-lg px-4 py-3 text-ink", style.box)}>
         {label && <p className={clsx("mb-1 text-xs font-extrabold uppercase tracking-wider", style.labelCls)}>{label}</p>}
         <Markdown>{m.content}</Markdown>
+        {Array.isArray(m.meta.videos) && m.meta.videos.length > 0 && <VideoSuggestions videos={m.meta.videos as LessonCard[]} />}
       </div>
     </motion.div>
   );
