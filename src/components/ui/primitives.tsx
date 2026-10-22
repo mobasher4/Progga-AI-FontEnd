@@ -1,5 +1,8 @@
+"use client";
+
 import clsx from "clsx";
 import { Loader2 } from "lucide-react";
+import { useT } from "@/i18n";
 
 export function ProgressBar({
   value,
@@ -28,11 +31,12 @@ export function Spinner({ className, size = 20 }: { className?: string; size?: n
   return <Loader2 size={size} className={clsx("animate-spin", className)} />;
 }
 
-export function PageLoader({ label = "Loading…" }: { label?: string }) {
+export function PageLoader({ label }: { label?: string }) {
+  const { t } = useT();
   return (
     <div className="grid min-h-[50vh] place-items-center">
       <div className="flex items-center gap-3 font-display text-lg font-bold text-ink-soft">
-        <Spinner className="text-grape-500" /> {label}
+        <Spinner className="text-grape-500" /> {label ?? t("common.loading")}
       </div>
     </div>
   );

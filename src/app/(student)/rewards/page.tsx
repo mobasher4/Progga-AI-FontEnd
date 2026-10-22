@@ -7,6 +7,7 @@ import useSWR, { useSWRConfig } from "swr";
 import { ProggaBot } from "@/components/brand/ProggaBot";
 import { useCelebrate } from "@/components/celebrate/CelebrationProvider";
 import { PageLoader, ProgressBar, Spinner } from "@/components/ui/primitives";
+import { useFormat, useT } from "@/i18n";
 import { api, errorMessage } from "@/lib/api";
 import type { Badge, LevelInfo, Skin } from "@/lib/types";
 
@@ -34,9 +35,11 @@ export default function RewardsPage() {
   const { data: shop, mutate: mutateShop } = useSWR<Shop>("/game/shop");
   const { mutate } = useSWRConfig();
   const { toast, burst } = useCelebrate();
+  const { t, tx, n } = useT();
+  const { date } = useFormat();
   const [busy, setBusy] = useState<string | null>(null);
 
-  if (!ach || !shop) return <PageLoader />;
+  if (!ach || !shop) return <PageLoader label={t("common.loading")} />;
   const earned = ach.badges.filter((b) => b.earnedAt).length;
 
   async function shopAction(kind: "buy" | "equip", skin: Skin) {
@@ -47,7 +50,7 @@ export default function RewardsPage() {
       void mutate("/auth/me");
       if (kind === "buy") {
         burst();
-        toast(`${skin.name} unlocked!`, "🤖", "grape");
+        toast(t("rewards.unlocked", { name: skin.name }), "🤖", "grape");
       }
     } catch (e) {
       toast(errorMessage(e), "🍌", "coral");
@@ -60,17 +63,17 @@ export default function RewardsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="eyebrow">Rewards</p>
-          <h1 className="mt-1 text-4xl font-extrabold">Your trophy room 🏆</h1>
+          <p className="eyebrow">{t("rewards.eyebrow")}</p>
+          <h1 className="mt-1 text-4xl font-extrabold">{t("rewards.title")}</h1>
         </div>
         <div className="flex rounded-2xl border-2 border-line bg-white p-1">
-          {(["badges", "shop"] as const).map((t) => (
+          {(["badges", "shop"] as const).map((key) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={clsx("rounded-xl px-5 py-2 font-display font-bold transition-colors", tab === t ? "bg-grape-500 text-white" : "text-ink-soft hover:text-ink")}
+              key={key}
+              onClick={() => setTab(key)}
+              className={clsx("rounded-xl px-5 py-2 font-display font-bold transition-colors", tab === key ? "bg-grape-500 text-white" : "text-ink-soft hover:text-ink")}
             >
-              {t === "badges" ? `Badges (${earned}/${ach.badges.length})` : "Robot shop"}
+              {key === "badges" ? t("rewards.badgesTab", { a: earned, b: ach.badges.length }) : t("rewards.shopTab")}
             </button>
           ))}
         </div>
@@ -80,35 +83,30 @@ export default function RewardsPage() {
         <>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="card p-5 sm:col-span-2">
-              <p className="eyebrow">Level {ach.level.level}</p>
-              <p className="font-display text-2xl font-extrabold">{ach.level.title}</p>
+              <p className="eyebrow">{t("common.levelN", { n: ach.level.level })}</p>
+              <p className="font-display text-2xl font-extrabold">{tx(`levelTitles.${ach.level.title}`, ach.level.title)}</p>
               <ProgressBar value={ach.level.progress} className="mt-3" height="h-4" />
-              <p className="mt-2 text-sm font-semibold text-ink-muted">{ach.level.xp} XP total · {ach.level.nextLevelXp - ach.level.xp} XP to next level</p>
+              <p className="mt-2 text-sm font-semibold text-ink-muted">{t("rewards.totalXp", { xp: ach.level.xp, n: ach.level.nextLevelXp - ach.level.xp })}</p>
             </div>
             <div className="card flex items-center gap-4 p-5">
               <span className="text-5xl">🔥</span>
               <div>
-                <p className="font-display text-3xl font-extrabold">{ach.streak} days</p>
-                <p className="text-sm font-semibold text-ink-muted">Best streak: {ach.bestStreak}</p>
+                <p className="font-display text-3xl font-extrabold">{t("rewards.days", { n: ach.streak })}</p>
+                <p className="text-sm font-semibold text-ink-muted">{t("rewards.bestStreak", { n: ach.bestStreak })}</p>
               </div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {ach.badges.map((b) => (
               <div key={b.id} className={clsx("card flex flex-col items-center p-5 text-center", !b.earnedAt && "bg-cream/60")}>
-                <div
-                  className={clsx(
-                    "relative grid h-20 w-20 place-items-center rounded-full bg-gradient-to-br text-4xl shadow-soft",
-                    b.earnedAt ? TIER[b.tier] : "from-line to-line grayscale",
-                  )}
-                >
+                <div className={clsx("relative grid h-20 w-20 place-items-center rounded-full bg-gradient-to-br text-4xl shadow-soft", b.earnedAt ? TIER[b.tier] : "from-line to-line grayscale")}>
                   <span className={clsx(!b.earnedAt && "opacity-30")}>{b.icon}</span>
                   {!b.earnedAt && <Lock size={18} className="absolute bottom-0 right-0 rounded-full bg-white p-0.5 text-ink-muted" />}
                 </div>
-                <p className="mt-3 font-display font-extrabold">{b.name}</p>
-                <p className="mt-0.5 text-xs text-ink-soft">{b.description}</p>
+                <p className="mt-3 font-display font-extrabold">{tx(`badges.${b.id}.name`, b.name)}</p>
+                <p className="mt-0.5 text-xs text-ink-soft">{tx(`badges.${b.id}.desc`, b.description)}</p>
                 <span className={clsx("mt-2 rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider", b.earnedAt ? "bg-mint-100 text-mint-700" : "bg-line text-ink-muted")}>
-                  {b.earnedAt ? `Earned ${new Date(b.earnedAt).toLocaleDateString()}` : b.tier}
+                  {b.earnedAt ? t("rewards.earned", { date: date(b.earnedAt) }) : t(`rewards.${b.tier}`)}
                 </span>
               </div>
             ))}
@@ -118,10 +116,10 @@ export default function RewardsPage() {
         <>
           <div className="card flex items-center justify-between gap-4 bg-gradient-to-r from-banana-100 to-banana-50 p-5">
             <div>
-              <p className="font-display text-xl font-extrabold">Kola coins 🍌</p>
-              <p className="text-sm text-ink-soft">Earn coins by solving steps, finishing lessons and completing quests.</p>
+              <p className="font-display text-xl font-extrabold">{t("rewards.coinsTitle")}</p>
+              <p className="text-sm text-ink-soft">{t("rewards.coinsBody")}</p>
             </div>
-            <p className="font-display text-4xl font-extrabold text-banana-700">{shop.coins}</p>
+            <p className="font-display text-4xl font-extrabold text-banana-700">{n(shop.coins)}</p>
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {shop.skins.map((s) => {
@@ -135,11 +133,11 @@ export default function RewardsPage() {
                   <p className="font-display text-lg font-extrabold">{s.name}</p>
                   {s.owned ? (
                     <button disabled={equipped || busy === s.id} onClick={() => shopAction("equip", s)} className={clsx("mt-3 w-full", equipped ? "btn-mint btn-sm" : "btn-ghost btn-sm")}>
-                      {busy === s.id ? <Spinner size={16} /> : equipped ? <><Check size={16} /> Equipped</> : "Equip"}
+                      {busy === s.id ? <Spinner size={16} /> : equipped ? <><Check size={16} /> {t("rewards.equipped")}</> : t("rewards.equip")}
                     </button>
                   ) : (
                     <button disabled={!affordable || busy === s.id} onClick={() => shopAction("buy", s)} className="btn-banana btn-sm mt-3 w-full">
-                      {busy === s.id ? <Spinner size={16} /> : <>🍌 {s.cost}</>}
+                      {busy === s.id ? <Spinner size={16} /> : <>🍌 {n(s.cost)}</>}
                     </button>
                   )}
                 </div>

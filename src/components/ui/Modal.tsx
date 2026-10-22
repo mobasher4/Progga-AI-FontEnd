@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useEffect } from "react";
+import { useT } from "@/i18n";
 
 export function Modal({
   open,
@@ -17,6 +18,7 @@ export function Modal({
   dismissable?: boolean;
   wide?: boolean;
 }) {
+  const { t } = useT();
   useEffect(() => {
     if (!open || !dismissable) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -48,7 +50,7 @@ export function Modal({
               <button
                 onClick={onClose}
                 className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full text-ink-muted hover:bg-grape-50 hover:text-ink"
-                aria-label="Close"
+                aria-label={t("common.close")}
               >
                 <X size={18} />
               </button>

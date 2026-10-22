@@ -8,6 +8,7 @@ import useSWR from "swr";
 import { ProggaBot } from "@/components/brand/ProggaBot";
 import { useCelebrate } from "@/components/celebrate/CelebrationProvider";
 import { PageLoader, ProgressBar, Spinner, SubjectIcon } from "@/components/ui/primitives";
+import { useT } from "@/i18n";
 import { api, errorMessage } from "@/lib/api";
 import { paletteFor } from "@/lib/skins";
 import type { QuizAttempt, QuizQuestion, Rewards, Subject } from "@/lib/types";
@@ -35,6 +36,7 @@ type Game = { subject: Subject; attempt: QuizAttempt; questions: QuizQuestion[] 
 
 export default function ArenaPage() {
   const { user } = useMe();
+  const { t, n, ui } = useT();
   const { data: subjects } = useSWR<{ subjects: Subject[] }>(user?.grade ? `/subjects?grade=${user.grade}` : null);
   const { data: history, mutate: refreshHistory } = useSWR<{ attempts: QuizAttempt[] }>("/quiz/history");
   const { toast } = useCelebrate();
@@ -67,7 +69,7 @@ export default function ArenaPage() {
       />
     );
   }
-  if (!subjects) return <PageLoader />;
+  if (!subjects) return <PageLoader label={t("common.loading")} />;
 
   const best = history?.attempts.reduce((m, a) => Math.max(m, a.score), 0) ?? 0;
 
@@ -78,26 +80,26 @@ export default function ArenaPage() {
         <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center">
           <ProggaBot size={130} mood="cheer" palette={user?.skin?.palette ?? paletteFor(user?.avatarSkin)} />
           <div className="flex-1">
-            <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-banana-300">Quiz Arena</p>
-            <h1 className="mt-1 text-4xl font-extrabold">Ready, set, think! ⚔️</h1>
+            <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-banana-300">{t("arena.eyebrow")}</p>
+            <h1 className="mt-1 text-4xl font-extrabold">{t("arena.title")}</h1>
             <div className="mt-4 flex flex-wrap gap-2 text-sm font-bold">
-              <span className="rounded-full bg-white/10 px-3 py-1.5">🎯 8 questions</span>
-              <span className="rounded-full bg-white/10 px-3 py-1.5">❤️ 3 hearts</span>
-              <span className="rounded-full bg-white/10 px-3 py-1.5">⏱️ {TIME_LIMIT}s each</span>
-              <span className="rounded-full bg-white/10 px-3 py-1.5">⚡ Combos up to ×2</span>
+              <span className="rounded-full bg-white/10 px-3 py-1.5">{t("arena.rule1")}</span>
+              <span className="rounded-full bg-white/10 px-3 py-1.5">{t("arena.rule2")}</span>
+              <span className="rounded-full bg-white/10 px-3 py-1.5">{t("arena.rule3", { n: TIME_LIMIT })}</span>
+              <span className="rounded-full bg-white/10 px-3 py-1.5">{t("arena.rule4")}</span>
             </div>
           </div>
           {best > 0 && (
             <div className="rounded-3xl bg-white/10 px-5 py-4 text-center">
-              <p className="text-xs font-extrabold uppercase tracking-wider text-banana-300">Best score</p>
-              <p className="font-display text-4xl font-extrabold">{best}</p>
+              <p className="text-xs font-extrabold uppercase tracking-wider text-banana-300">{t("arena.best")}</p>
+              <p className="font-display text-4xl font-extrabold">{n(best)}</p>
             </div>
           )}
         </div>
       </section>
 
       <section>
-        <h2 className="mb-4 text-2xl font-extrabold">Choose your arena</h2>
+        <h2 className="mb-4 text-2xl font-extrabold">{t("arena.choose")}</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {subjects.subjects.map((s) => (
             <button
@@ -107,11 +109,11 @@ export default function ArenaPage() {
               className="card group flex items-center gap-4 p-4 text-left transition-all hover:-translate-y-1 hover:shadow-lift disabled:opacity-60"
             >
               <SubjectIcon icon={s.icon} color={s.color} size={56} />
-              <div className="flex-1">
-                <p className="font-display text-lg font-extrabold">{s.name}</p>
-                <p className="text-sm text-ink-muted">{s.nameBn}</p>
+              <div className="min-w-0 flex-1">
+                <p className="font-display text-lg font-extrabold">{ui === "bn" ? s.nameBn : s.name}</p>
+                <p className="text-sm text-ink-muted">{ui === "bn" ? s.name : s.nameBn}</p>
               </div>
-              <span className="grid h-10 w-10 place-items-center rounded-full bg-grape-50 text-grape-600 transition-colors group-hover:bg-grape-500 group-hover:text-white">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-grape-50 text-grape-600 transition-colors group-hover:bg-grape-500 group-hover:text-white">
                 {starting === s.id ? <Spinner size={18} /> : <ArrowRight size={18} />}
               </span>
             </button>
@@ -124,6 +126,7 @@ export default function ArenaPage() {
 
 function Round({ game, onExit, onReplay }: { game: Game; onExit: () => void; onReplay: () => void }) {
   const { celebrate, toast } = useCelebrate();
+  const { t, n } = useT();
   const [attempt, setAttempt] = useState(game.attempt);
   const [index, setIndex] = useState(0);
   const [chosen, setChosen] = useState<number | null>(null);
@@ -144,10 +147,8 @@ function Round({ game, onExit, onReplay }: { game: Game; onExit: () => void; onR
         const r = await api<AnswerResult>(`/quiz/${attempt.id}/answer`, { body: { questionId: q.id, choice, ms: Date.now() - startedAt.current } });
         setResult(r);
         setAttempt(r.attempt);
-        if (r.correct && r.attempt.combo >= 3) toast(`${r.attempt.combo}× combo!`, "⚡", "banana");
-        if (r.attempt.finished) {
-          celebrate(r.rewards, { confetti: (r.summary?.accuracy ?? 0) >= 0.75 });
-        }
+        if (r.correct && r.attempt.combo >= 3) toast(t("arena.combo", { n: r.attempt.combo }), "⚡", "banana");
+        if (r.attempt.finished) celebrate(r.rewards, { confetti: (r.summary?.accuracy ?? 0) >= 0.75 });
       } catch (e) {
         toast(errorMessage(e), "⚠️", "coral");
         setChosen(null);
@@ -155,7 +156,7 @@ function Round({ game, onExit, onReplay }: { game: Game; onExit: () => void; onR
         setSubmitting(false);
       }
     },
-    [attempt.id, q, result, submitting, celebrate, toast],
+    [attempt.id, q, result, submitting, celebrate, toast, t],
   );
 
   // countdown
@@ -163,15 +164,15 @@ function Round({ game, onExit, onReplay }: { game: Game; onExit: () => void; onR
     if (result || final) return;
     startedAt.current = Date.now();
     setLeft(TIME_LIMIT);
-    const t = setInterval(() => {
+    const timer = setInterval(() => {
       const remaining = TIME_LIMIT - (Date.now() - startedAt.current) / 1000;
       setLeft(Math.max(0, remaining));
       if (remaining <= 0) {
-        clearInterval(t);
+        clearInterval(timer);
         void submit(-1);
       }
     }, 100);
-    return () => clearInterval(t);
+    return () => clearInterval(timer);
     // restart only for a new question; answering (result) stops the clock via cleanup
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, final, result === null]);
@@ -191,8 +192,8 @@ function Round({ game, onExit, onReplay }: { game: Game; onExit: () => void; onR
   return (
     <div className="mx-auto max-w-3xl space-y-5">
       <div className="flex items-center justify-between gap-3">
-        <button onClick={onExit} className="btn-ghost btn-sm">Quit</button>
-        <div className="flex items-center gap-1" aria-label={`${attempt.hearts} hearts left`}>
+        <button onClick={onExit} className="btn-ghost btn-sm">{t("arena.quit")}</button>
+        <div className="flex items-center gap-1" aria-label={t("arena.heartsLeft", { n: attempt.hearts })}>
           {Array.from({ length: 3 }, (_, i) => (
             <Heart key={i} size={26} className={i < attempt.hearts ? "fill-coral-500 text-coral-500" : "text-line"} />
           ))}
@@ -201,19 +202,19 @@ function Round({ game, onExit, onReplay }: { game: Game; onExit: () => void; onR
           <AnimatePresence>
             {attempt.combo >= 2 && (
               <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} className="chip border-banana-300 bg-banana-100 text-banana-700">
-                <Zap size={15} className="fill-banana-500" /> {attempt.combo}×
+                <Zap size={15} className="fill-banana-500" /> {n(attempt.combo)}×
               </motion.span>
             )}
           </AnimatePresence>
-          <span className="chip border-grape-100 bg-white font-display text-lg text-grape-600">{attempt.score}</span>
+          <span className="chip border-grape-100 bg-white font-display text-lg text-grape-600">{n(attempt.score)}</span>
         </div>
       </div>
 
       <div className="flex items-center gap-3">
-        <span className="text-sm font-extrabold text-ink-muted">Q{index + 1}/{game.questions.length}</span>
+        <span className="text-sm font-extrabold text-ink-muted">Q{n(index + 1)}/{n(game.questions.length)}</span>
         <ProgressBar value={left / TIME_LIMIT} height="h-3" color={left < 5 ? "bg-coral-500" : "bg-grape-500"} className="flex-1" />
         <span className={clsx("flex w-12 items-center gap-1 text-sm font-extrabold", left < 5 ? "text-coral-600" : "text-ink-muted")}>
-          <Timer size={15} /> {Math.ceil(left)}
+          <Timer size={15} /> {n(Math.ceil(left))}
         </span>
       </div>
 
@@ -249,12 +250,12 @@ function Round({ game, onExit, onReplay }: { game: Game; onExit: () => void; onR
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
               <div className={clsx("flex-1 rounded-2xl p-4", result.correct ? "bg-mint-50" : "bg-coral-50")}>
                 <p className={clsx("font-display text-lg font-extrabold", result.correct ? "text-mint-700" : "text-coral-600")}>
-                  {result.correct ? `Correct! +${result.points} pts` : chosen === -1 ? "⏰ Time's up!" : "Not this time"}
+                  {result.correct ? t("arena.correctPts", { n: result.points }) : chosen === -1 ? t("arena.timeUp") : t("arena.notThisTime")}
                 </p>
                 <p className="text-ink-soft">{result.explanation}</p>
               </div>
               <button onClick={next} className="btn-primary" autoFocus>
-                {result.attempt.finished ? "See results" : "Next"} <ArrowRight size={18} />
+                {result.attempt.finished ? t("arena.seeResults") : t("arena.next")} <ArrowRight size={18} />
               </button>
             </motion.div>
           )}
@@ -265,6 +266,7 @@ function Round({ game, onExit, onReplay }: { game: Game; onExit: () => void; onR
 }
 
 function Results({ game, result, onExit, onReplay }: { game: Game; result: AnswerResult; onExit: () => void; onReplay: () => void }) {
+  const { t, n, ui } = useT();
   const a = result.attempt;
   const acc = result.summary?.accuracy ?? 0;
   const stars = acc >= 0.9 ? 3 : acc >= 0.6 ? 2 : acc > 0 ? 1 : 0;
@@ -282,14 +284,14 @@ function Results({ game, result, onExit, onReplay }: { game: Game; result: Answe
           ))}
         </div>
         <h1 className="mt-3 text-4xl font-extrabold">
-          {result.summary?.perfect ? "PERFECT ROUND!" : result.summary?.outOfHearts ? "Out of hearts!" : stars >= 2 ? "Great round!" : "Good try!"}
+          {result.summary?.perfect ? t("arena.perfect") : result.summary?.outOfHearts ? t("arena.outOfHearts") : stars >= 2 ? t("arena.great") : t("arena.goodTry")}
         </h1>
-        <p className="mt-1 text-ink-soft">{game.subject.icon} {game.subject.name}</p>
+        <p className="mt-1 text-ink-soft">{game.subject.icon} {ui === "bn" ? game.subject.nameBn : game.subject.name}</p>
         <div className="mt-6 grid grid-cols-3 gap-3">
           {[
-            ["Score", a.score],
-            ["Correct", `${a.correctCount}/${a.total}`],
-            ["Best combo", `${a.bestCombo}×`],
+            [t("arena.score"), n(a.score)],
+            [t("arena.correct"), `${n(a.correctCount)}/${n(a.total)}`],
+            [t("arena.bestCombo"), `${n(a.bestCombo)}×`],
           ].map(([label, v]) => (
             <div key={label} className="rounded-2xl bg-cream p-3">
               <p className="font-display text-2xl font-extrabold">{v}</p>
@@ -299,12 +301,12 @@ function Results({ game, result, onExit, onReplay }: { game: Game; result: Answe
         </div>
         {result.rewards && (
           <p className="mt-5 font-display text-lg font-extrabold text-grape-600">
-            +{result.rewards.xpGained} XP · +{result.rewards.coinsGained} 🍌
+            +{n(result.rewards.xpGained)} XP · +{n(result.rewards.coinsGained)} 🍌
           </p>
         )}
         <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-          <button onClick={onReplay} className="btn-primary flex-1"><RotateCcw size={18} /> Play again</button>
-          <button onClick={onExit} className="btn-ghost flex-1">Change arena</button>
+          <button onClick={onReplay} className="btn-primary flex-1"><RotateCcw size={18} /> {t("arena.playAgain")}</button>
+          <button onClick={onExit} className="btn-ghost flex-1">{t("arena.change")}</button>
         </div>
       </div>
     </div>

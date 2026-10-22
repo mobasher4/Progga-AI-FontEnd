@@ -4,6 +4,7 @@ import confetti from "canvas-confetti";
 import { AnimatePresence, motion } from "framer-motion";
 import { createContext, useCallback, useContext, useRef, useState } from "react";
 import { useSWRConfig } from "swr";
+import { useT } from "@/i18n";
 import type { Badge, Rewards } from "@/lib/types";
 import { ProggaBot } from "../brand/ProggaBot";
 import { Modal } from "../ui/Modal";
@@ -42,6 +43,7 @@ export function CelebrationProvider({ children }: { children: React.ReactNode })
   const [badges, setBadges] = useState<Badge[]>([]);
   const nextId = useRef(1);
   const { mutate } = useSWRConfig();
+  const { t, tx } = useT();
 
   const toast = useCallback((text: string, icon = "✨", tone: Toast["tone"] = "grape") => {
     const id = nextId.current++;
@@ -58,8 +60,8 @@ export function CelebrationProvider({ children }: { children: React.ReactNode })
   const celebrate = useCallback<Ctx["celebrate"]>(
     (r, opts) => {
       if (!r) return;
-      if (r.xpGained > 0) toast(`+${r.xpGained} XP`, "⭐", "grape");
-      if (r.coinsGained > 0) setTimeout(() => toast(`+${r.coinsGained} Kola coins`, "🍌", "banana"), 250);
+      if (r.xpGained > 0) toast(t("celebrate.xp", { n: r.xpGained }), "⭐", "grape");
+      if (r.coinsGained > 0) setTimeout(() => toast(t("celebrate.coins", { n: r.coinsGained }), "🍌", "banana"), 250);
       if (opts?.confetti || r.leveledUp || r.newBadges.length) burst();
       if (r.leveledUp) setLevelUp(r.level);
       if (r.newBadges.length) setBadges((b) => [...b, ...r.newBadges]);
@@ -68,7 +70,7 @@ export function CelebrationProvider({ children }: { children: React.ReactNode })
       void mutate("/me/dashboard");
       void mutate("/game/quests");
     },
-    [toast, burst, mutate],
+    [toast, burst, mutate, t],
   );
 
   const badge = badges[0];
@@ -97,11 +99,11 @@ export function CelebrationProvider({ children }: { children: React.ReactNode })
       <Modal open={levelUp !== null} onClose={() => setLevelUp(null)}>
         <div className="flex flex-col items-center text-center">
           <ProggaBot mood="cheer" size={150} />
-          <p className="eyebrow mt-2">Level up!</p>
-          <h2 className="mt-1 text-4xl font-extrabold">You reached level {levelUp}</h2>
-          <p className="mt-2 text-ink-soft">Your brain is getting stronger every day. Keep going! 🚀</p>
+          <p className="eyebrow mt-2">{t("celebrate.levelUp")}</p>
+          <h2 className="mt-1 text-4xl font-extrabold">{t("celebrate.reached", { n: levelUp ?? 0 })}</h2>
+          <p className="mt-2 text-ink-soft">{t("celebrate.levelBody")}</p>
           <button className="btn-primary mt-6 w-full" onClick={() => setLevelUp(null)}>
-            Awesome!
+            {t("celebrate.awesome")}
           </button>
         </div>
       </Modal>
@@ -117,11 +119,11 @@ export function CelebrationProvider({ children }: { children: React.ReactNode })
             >
               {badge.icon}
             </motion.div>
-            <p className="eyebrow mt-5">New badge unlocked</p>
-            <h2 className="mt-1 text-3xl font-extrabold">{badge.name}</h2>
-            <p className="mt-2 text-ink-soft">{badge.description}</p>
+            <p className="eyebrow mt-5">{t("celebrate.newBadge")}</p>
+            <h2 className="mt-1 text-3xl font-extrabold">{tx(`badges.${badge.id}.name`, badge.name)}</h2>
+            <p className="mt-2 text-ink-soft">{tx(`badges.${badge.id}.desc`, badge.description)}</p>
             <button className="btn-banana mt-6 w-full" onClick={() => setBadges((b) => b.slice(1))}>
-              Collect badge
+              {t("celebrate.collect")}
             </button>
           </div>
         )}

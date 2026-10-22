@@ -2,11 +2,13 @@
 
 import clsx from "clsx";
 import { motion } from "framer-motion";
-import { Check, Eye, Lock, Flag } from "lucide-react";
+import { Check, Eye, Flag, Lock } from "lucide-react";
+import { useT } from "@/i18n";
 import type { TutorSession } from "@/lib/types";
 
 /** The student's path through the micro-steps. Future goals stay locked so the method isn't spoiled. */
 export function MissionMap({ session }: { session: TutorSession }) {
+  const { t, n } = useT();
   const solved = session.status === "solved";
   return (
     <ol className="relative space-y-1">
@@ -31,7 +33,7 @@ export function MissionMap({ session }: { session: TutorSession }) {
                 s.state === "locked" && "border-line bg-cream text-ink-muted",
               )}
             >
-              {s.state === "done" ? <Check size={17} strokeWidth={3.5} /> : s.state === "revealed" ? <Eye size={16} /> : s.state === "locked" ? <Lock size={14} /> : i + 1}
+              {s.state === "done" ? <Check size={17} strokeWidth={3.5} /> : s.state === "revealed" ? <Eye size={16} /> : s.state === "locked" ? <Lock size={14} /> : n(i + 1)}
               {s.state === "current" && (
                 <motion.span
                   className="absolute inset-[-6px] rounded-full border-2 border-grape-300"
@@ -42,13 +44,14 @@ export function MissionMap({ session }: { session: TutorSession }) {
             </span>
             <div className="min-w-0 pt-1">
               <p className={clsx("font-display font-bold leading-tight", s.state === "locked" ? "text-ink-muted" : "text-ink")}>
-                {s.goal ?? "Secret step"}
+                {s.goal ?? t("mission.secret")}
               </p>
               <p className="mt-0.5 text-xs font-semibold text-ink-muted">
-                {s.state === "done" && (s.hintsShown ? `Solved with ${s.hintsShown} hint${s.hintsShown > 1 ? "s" : ""}` : "Solved on your own ⭐")}
-                {s.state === "revealed" && "Shown by Progga"}
-                {s.state === "current" && `Your turn · ${s.hintsTotal - s.hintsShown} hints left`}
-                {s.state === "locked" && "Unlocks soon"}
+                {s.state === "done" &&
+                  (s.hintsShown === 0 ? t("mission.solo") : s.hintsShown === 1 ? t("mission.withHint") : t("mission.withHints", { n: s.hintsShown }))}
+                {s.state === "revealed" && t("mission.shown")}
+                {s.state === "current" && t("mission.current", { n: s.hintsTotal - s.hintsShown })}
+                {s.state === "locked" && t("mission.locked")}
               </p>
             </div>
           </li>
@@ -58,7 +61,7 @@ export function MissionMap({ session }: { session: TutorSession }) {
         <span className={clsx("grid h-9 w-9 place-items-center rounded-full", solved ? "bg-banana-400 text-ink" : "bg-cream text-ink-muted")}>
           <Flag size={16} />
         </span>
-        <p className={clsx("font-display font-bold", solved ? "text-ink" : "text-ink-muted")}>{solved ? "Solved! 🎉" : "Finish line"}</p>
+        <p className={clsx("font-display font-bold", solved ? "text-ink" : "text-ink-muted")}>{solved ? t("mission.solved") : t("mission.finish")}</p>
       </li>
     </ol>
   );

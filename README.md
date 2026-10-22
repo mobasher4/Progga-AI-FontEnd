@@ -25,6 +25,13 @@ The app proxies `/api/*` to `BACKEND_URL` (see `next.config.ts`), so the httpOnl
 | Parent / teacher | Linked students, learning report (independence score, topics, misconceptions, safety alerts), read-only transcripts, daily limits |
 | Admin | **AI settings**: choose provider + model, test it, switch live |
 
+## Languages (English · বাংলা · Banglish)
+
+- The language switcher sits in every top bar (`src/components/LanguageSwitcher.tsx`). It changes the whole interface and the language Progga's AI replies in.
+- UI strings live in `src/i18n/en.ts` and `src/i18n/bn.ts`. TypeScript requires `bn.ts` to have every key in `en.ts`. Use `const { t } = useT()` and `t("home.title")`; numbers render as Bangla digits in বাংলা.
+- **Banglish** keeps the interface in English while Progga chats in Banglish.
+- The choice is stored in a cookie (no flash on reload) and, when signed in, saved to the account, so the backend and the AI use it. If the student switches mid-session, the rest of the lesson plan is translated once so everything stays in one language.
+
 ## Design
 
 - Playful palette (grape, banana, mint) on a warm cream canvas; tokens live in `src/app/globals.css`.
