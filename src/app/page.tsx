@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { ProggaBot } from "@/components/brand/ProggaBot";
+import { HeroScene } from "@/components/landing/HeroScene";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useT, type TKey } from "@/i18n";
 
@@ -67,8 +68,8 @@ function Hero() {
       <div className="absolute -right-32 -top-32 -z-10 h-[520px] w-[520px] rounded-full bg-banana-200/50 blur-3xl" />
       <div className="absolute -left-40 top-40 -z-10 h-[420px] w-[420px] rounded-full bg-brand-200/40 blur-3xl" />
 
-      <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-14 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:pt-20">
-        <div>
+      <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 pb-20 pt-14 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:pt-20">
+        <div className="min-w-0">
           <span className="chip border-brand-100 bg-white text-brand-600">
             <span className="h-2 w-2 rounded-full bg-mint-500" /> {t("landing.chip")}
           </span>
@@ -99,58 +100,9 @@ function Hero() {
           </ul>
         </div>
 
-        <HeroVisual />
+        <HeroScene />
       </div>
     </section>
-  );
-}
-
-function HeroVisual() {
-  const { t } = useT();
-  return (
-    <div className="relative mx-auto w-full max-w-md">
-      <div className="absolute -left-6 top-6 z-10 hidden sm:block">
-        <ProggaBot size={130} mood="asking" />
-      </div>
-      <div className="card relative ml-auto w-full p-5 shadow-lift sm:w-[88%]">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <p className="eyebrow">{t("landing.demoMission")}</p>
-            <p className="font-display text-lg font-extrabold">{t("landing.demoTitle")}</p>
-          </div>
-          <span className="chip border-banana-200 bg-banana-50 text-banana-700">{t("landing.demoStep")}</span>
-        </div>
-        <div className="mb-4 flex gap-1.5">
-          <span className="h-2 flex-1 rounded-full bg-mint-500" />
-          <span className="h-2 flex-1 rounded-full bg-brand-500" />
-          <span className="h-2 flex-1 rounded-full bg-brand-100" />
-        </div>
-        <div className="space-y-2.5 text-[15px]">
-          <Bubble me>{t("landing.demoQ")}</Bubble>
-          <Bubble>{t("landing.demoA1")}</Bubble>
-          <Bubble me>x</Bubble>
-          <div className="rounded-2xl border-2 border-mint-100 bg-mint-50 px-3.5 py-2.5">
-            <p className="text-xs font-extrabold uppercase tracking-wider text-mint-600">{t("landing.demoWhy")}</p>
-            <p className="mt-0.5 text-ink-soft">{t("landing.demoWhyText")}</p>
-          </div>
-          <Bubble question label={t("landing.demoYourTurn")}>{t("landing.demoAsk")}</Bubble>
-        </div>
-      </div>
-      <div className="absolute -right-3 -top-5 animate-float rounded-2xl bg-brand-500 px-3.5 py-2 font-display font-extrabold text-white shadow-lift">⭐ +15 XP</div>
-      <div className="absolute -bottom-5 left-4 animate-float rounded-2xl bg-white px-3.5 py-2 font-display font-extrabold text-coral-600 shadow-lift [animation-delay:1.2s]">
-        {t("landing.demoStreak")}
-      </div>
-    </div>
-  );
-}
-
-function Bubble({ children, me, question, label }: { children: React.ReactNode; me?: boolean; question?: boolean; label?: string }) {
-  if (me) return <div className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-md bg-brand-500 px-3.5 py-2 font-semibold text-white">{children}</div>;
-  return (
-    <div className={`w-fit max-w-[88%] rounded-2xl rounded-bl-md px-3.5 py-2 ${question ? "border-2 border-banana-300 bg-banana-50" : "bg-cream"}`}>
-      {question && <p className="text-xs font-extrabold uppercase tracking-wider text-banana-700">{label}</p>}
-      {children}
-    </div>
   );
 }
 
