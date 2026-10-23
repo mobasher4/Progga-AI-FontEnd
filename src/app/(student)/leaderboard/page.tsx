@@ -53,7 +53,7 @@ export default function LeaderboardPage() {
               return (
                 <div key={e.rank} className="flex w-28 flex-col items-center sm:w-36">
                   <ProggaBot size={e.rank === 1 ? 90 : 72} palette={paletteFor(e.avatarSkin)} mood={e.rank === 1 ? "happy" : "idle"} />
-                  <p className={clsx("mt-1 max-w-full truncate font-display font-extrabold", e.isMe && "text-grape-600")}>{e.isMe ? t("leaderboard.you") : e.name}</p>
+                  <p className={clsx("mt-1 max-w-full truncate font-display font-extrabold", e.isMe && "text-brand-600")}>{e.isMe ? t("leaderboard.you") : e.name}</p>
                   <p className="text-sm font-bold text-ink-muted">{n(e.weeklyXp)} XP</p>
                   <div className={clsx("mt-2 grid w-full place-items-start justify-center rounded-t-3xl bg-gradient-to-b pt-3 text-4xl", p.height, p.color)}>{p.medal}</div>
                 </div>
@@ -63,7 +63,7 @@ export default function LeaderboardPage() {
 
           <div className="card divide-y divide-line overflow-hidden">
             {data.entries.map((e) => (
-              <div key={e.rank} className={clsx("flex items-center gap-4 px-5 py-3", e.isMe && "bg-grape-50")}>
+              <div key={e.rank} className={clsx("flex items-center gap-4 px-5 py-3", e.isMe && "bg-brand-50")}>
                 <span className="w-7 text-center font-display text-lg font-extrabold text-ink-muted">{n(e.rank)}</span>
                 <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-2xl bg-cream">
                   <ProggaBot size={36} palette={paletteFor(e.avatarSkin)} float={false} />
@@ -72,7 +72,7 @@ export default function LeaderboardPage() {
                   <p className="truncate font-display font-bold">{e.isMe ? t("leaderboard.youSuffix", { name: e.name }) : e.name}</p>
                   <p className="text-xs font-semibold text-ink-muted">{t("common.levelN", { n: e.level })}</p>
                 </div>
-                <span className="font-display text-lg font-extrabold text-grape-600">{n(e.weeklyXp)} XP</span>
+                <span className="font-display text-lg font-extrabold text-brand-600">{n(e.weeklyXp)} XP</span>
               </div>
             ))}
           </div>

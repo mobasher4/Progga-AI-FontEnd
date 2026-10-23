@@ -13,7 +13,7 @@ interface Toast {
   id: number;
   icon: string;
   text: string;
-  tone: "grape" | "banana" | "mint" | "coral";
+  tone: "brand" | "banana" | "mint" | "coral";
 }
 
 interface Ctx {
@@ -31,7 +31,7 @@ export function useCelebrate() {
 }
 
 const TONES: Record<Toast["tone"], string> = {
-  grape: "bg-grape-500 text-white",
+  brand: "bg-brand-500 text-white",
   banana: "bg-banana-400 text-ink",
   mint: "bg-mint-500 text-white",
   coral: "bg-coral-500 text-white",
@@ -45,14 +45,14 @@ export function CelebrationProvider({ children }: { children: React.ReactNode })
   const { mutate } = useSWRConfig();
   const { t, tx } = useT();
 
-  const toast = useCallback((text: string, icon = "✨", tone: Toast["tone"] = "grape") => {
+  const toast = useCallback((text: string, icon = "✨", tone: Toast["tone"] = "brand") => {
     const id = nextId.current++;
     setToasts((t) => [...t, { id, icon, text, tone }]);
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 2800);
   }, []);
 
   const burst = useCallback(() => {
-    const colors = ["#6C4CF1", "#FFD43B", "#22C493", "#FF6B6B", "#3BA7FF"];
+    const colors = ["#2B7BE8", "#FFD43B", "#22C493", "#FF6B6B", "#3BA7FF"];
     confetti({ particleCount: 90, spread: 75, origin: { y: 0.7 }, colors, scalar: 1.05 });
     setTimeout(() => confetti({ particleCount: 50, spread: 110, origin: { y: 0.6 }, colors }), 220);
   }, []);
@@ -60,7 +60,7 @@ export function CelebrationProvider({ children }: { children: React.ReactNode })
   const celebrate = useCallback<Ctx["celebrate"]>(
     (r, opts) => {
       if (!r) return;
-      if (r.xpGained > 0) toast(t("celebrate.xp", { n: r.xpGained }), "⭐", "grape");
+      if (r.xpGained > 0) toast(t("celebrate.xp", { n: r.xpGained }), "⭐", "brand");
       if (r.coinsGained > 0) setTimeout(() => toast(t("celebrate.coins", { n: r.coinsGained }), "🍌", "banana"), 250);
       if (opts?.confetti || r.leveledUp || r.newBadges.length) burst();
       if (r.leveledUp) setLevelUp(r.level);

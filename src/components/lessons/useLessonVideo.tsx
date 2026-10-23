@@ -155,9 +155,9 @@ export function CheckpointModal({ video }: { video: LessonVideo }) {
                 key={i}
                 onClick={() => answer(i)}
                 disabled={answering || result?.correct}
-                className="flex items-center gap-3 rounded-2xl border-2 border-line bg-white px-4 py-3 text-left font-semibold transition-all hover:border-grape-300 hover:bg-grape-50 disabled:opacity-60"
+                className="flex items-center gap-3 rounded-2xl border-2 border-line bg-white px-4 py-3 text-left font-semibold transition-all hover:border-brand-300 hover:bg-brand-50 disabled:opacity-60"
               >
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-grape-50 font-display font-extrabold text-grape-600">{String.fromCharCode(65 + i)}</span>
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-brand-50 font-display font-extrabold text-brand-600">{String.fromCharCode(65 + i)}</span>
                 {o}
               </button>
             ))}

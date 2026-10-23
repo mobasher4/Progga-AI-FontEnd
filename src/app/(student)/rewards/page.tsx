@@ -50,7 +50,7 @@ export default function RewardsPage() {
       void mutate("/auth/me");
       if (kind === "buy") {
         burst();
-        toast(t("rewards.unlocked", { name: skin.name }), "🤖", "grape");
+        toast(t("rewards.unlocked", { name: skin.name }), "🤖", "brand");
       }
     } catch (e) {
       toast(errorMessage(e), "🍌", "coral");
@@ -71,7 +71,7 @@ export default function RewardsPage() {
             <button
               key={key}
               onClick={() => setTab(key)}
-              className={clsx("rounded-xl px-5 py-2 font-display font-bold transition-colors", tab === key ? "bg-grape-500 text-white" : "text-ink-soft hover:text-ink")}
+              className={clsx("rounded-xl px-5 py-2 font-display font-bold transition-colors", tab === key ? "bg-brand-500 text-white" : "text-ink-soft hover:text-ink")}
             >
               {key === "badges" ? t("rewards.badgesTab", { a: earned, b: ach.badges.length }) : t("rewards.shopTab")}
             </button>
@@ -126,7 +126,7 @@ export default function RewardsPage() {
               const equipped = shop.equipped === s.id;
               const affordable = shop.coins >= s.cost;
               return (
-                <div key={s.id} className={clsx("card flex flex-col items-center p-5 text-center", equipped && "border-2 border-grape-400 ring-4 ring-grape-100")}>
+                <div key={s.id} className={clsx("card flex flex-col items-center p-5 text-center", equipped && "border-2 border-brand-400 ring-4 ring-brand-100")}>
                   <div className="grid h-36 place-items-center">
                     <ProggaBot size={110} palette={s.palette} float={equipped} mood={equipped ? "happy" : "idle"} />
                   </div>

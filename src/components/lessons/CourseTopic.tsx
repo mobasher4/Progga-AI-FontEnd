@@ -99,7 +99,7 @@ export function CourseTopic({ data, refresh }: { data: LessonResponse & { course
                 <Todo done={videoDone} label={t("lessons.todoVideo")} />
                 {hasReading && <Todo done={readDone} label={t("lessons.todoRead")} />}
               </div>
-              <span className="text-sm font-extrabold text-grape-500 sm:ml-auto">+{lesson.xpReward} XP</span>
+              <span className="text-sm font-extrabold text-brand-500 sm:ml-auto">+{lesson.xpReward} XP</span>
             </div>
           )}
 
@@ -135,10 +135,10 @@ export function CourseTopic({ data, refresh }: { data: LessonResponse & { course
             {ctx.next ? (
               <Link href={`/lessons/${ctx.next.id}`} className="card flex min-w-0 items-center justify-end gap-3 p-4 text-right transition-all hover:-translate-y-0.5 hover:shadow-lift sm:max-w-[48%]">
                 <span className="min-w-0">
-                  <span className="block text-xs font-extrabold uppercase tracking-wider text-grape-600">{t("lessons.nextTopic")}</span>
+                  <span className="block text-xs font-extrabold uppercase tracking-wider text-brand-600">{t("lessons.nextTopic")}</span>
                   <span className="block truncate font-bold">{ctx.next.title}</span>
                 </span>
-                <ArrowRight size={20} className="shrink-0 text-grape-600" />
+                <ArrowRight size={20} className="shrink-0 text-brand-600" />
               </Link>
             ) : (
               <p className="card p-4 font-display font-extrabold text-mint-700">{t("lessons.courseEnd")}</p>
@@ -146,7 +146,7 @@ export function CourseTopic({ data, refresh }: { data: LessonResponse & { course
           </nav>
 
           <Link href={`/tutor?subject=${ctx.course.subject.id}`} className="card flex items-center gap-3 p-4 transition-all hover:-translate-y-0.5 hover:shadow-lift">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-grape-500 text-white"><Sparkles size={20} /></span>
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-500 text-white"><Sparkles size={20} /></span>
             <span>
               <span className="block font-display font-bold">{t("lessons.askAbout")}</span>
               <span className="text-sm text-ink-soft">{t("lessons.workThrough")}</span>
@@ -211,7 +211,7 @@ function Outline({ ctx, currentId }: { ctx: TopicContext; currentId: string }) {
                   {done === ch.topics.length && done > 0 ? <Check size={13} strokeWidth={3} /> : n(ch.number)}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className={clsx("block text-sm font-bold leading-snug", ch.id === ctx.chapterId && "text-grape-700")}>{pick(ch.title, ch.titleBn)}</span>
+                  <span className={clsx("block text-sm font-bold leading-snug", ch.id === ctx.chapterId && "text-brand-700")}>{pick(ch.title, ch.titleBn)}</span>
                   <span className="text-xs font-semibold text-ink-muted">{n(done)}/{n(ch.topics.length)}</span>
                 </span>
                 <ChevronDown size={16} className={clsx("mt-1 shrink-0 text-ink-muted transition-transform", isOpen && "rotate-180")} />
@@ -225,7 +225,7 @@ function Outline({ ctx, currentId }: { ctx: TopicContext; currentId: string }) {
                         aria-current={tp.id === currentId ? "page" : undefined}
                         className={clsx(
                           "flex items-center gap-2.5 py-2 pl-6 pr-4 text-sm transition-colors",
-                          tp.id === currentId ? "border-l-4 border-grape-500 bg-grape-50 pl-5 font-extrabold text-grape-700" : "font-semibold text-ink-soft hover:bg-cream/60 hover:text-ink",
+                          tp.id === currentId ? "border-l-4 border-brand-500 bg-brand-50 pl-5 font-extrabold text-brand-700" : "font-semibold text-ink-soft hover:bg-cream/60 hover:text-ink",
                         )}
                       >
                         {tp.completed ? (

@@ -108,7 +108,7 @@ export default function StudentReport({ params }: { params: Promise<{ studentId:
               <div key={d.day} className="flex flex-1 flex-col items-center gap-2">
                 <span className="text-xs font-bold text-ink-muted">{d.xp ? n(d.xp) : ""}</span>
                 <div className="flex w-full flex-1 items-end">
-                  <div className={clsx("w-full rounded-t-xl", d.xp ? "bg-gradient-to-t from-grape-500 to-grape-300" : "bg-line")} style={{ height: `${Math.max(4, (d.xp / maxXp) * 100)}%` }} />
+                  <div className={clsx("w-full rounded-t-xl", d.xp ? "bg-gradient-to-t from-brand-500 to-brand-300" : "bg-line")} style={{ height: `${Math.max(4, (d.xp / maxXp) * 100)}%` }} />
                 </div>
                 <span className="text-xs font-bold text-ink-soft">{weekday(d.day)}</span>
               </div>
@@ -146,7 +146,7 @@ export default function StudentReport({ params }: { params: Promise<{ studentId:
           {tutor.topTopics.length ? (
             <div className="flex flex-wrap gap-2">
               {tutor.topTopics.map((tp) => (
-                <span key={tp.topic} className="chip border-grape-100 bg-grape-50 text-grape-700">{tp.topic} <span className="text-grape-400">×{n(tp.count)}</span></span>
+                <span key={tp.topic} className="chip border-brand-100 bg-brand-50 text-brand-700">{tp.topic} <span className="text-brand-400">×{n(tp.count)}</span></span>
               ))}
             </div>
           ) : <p className="text-ink-soft">{t("report.noSessions")}</p>}

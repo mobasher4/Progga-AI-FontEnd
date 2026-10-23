@@ -187,7 +187,7 @@ function HistoryPanel({ onClose, closeIcon }: { onClose: () => void; closeIcon: 
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("chatui.search")}
-            className="w-full rounded-xl border border-line bg-white py-2 pl-9 pr-3 text-sm outline-none transition-colors placeholder:text-ink-muted focus:border-grape-300"
+            className="w-full rounded-xl border border-line bg-white py-2 pl-9 pr-3 text-sm outline-none transition-colors placeholder:text-ink-muted focus:border-brand-300"
           />
         </label>
       </div>
@@ -208,12 +208,12 @@ function HistoryPanel({ onClose, closeIcon }: { onClose: () => void; closeIcon: 
                       href={`/tutor/${s.id}`}
                       className={clsx(
                         "group flex items-center gap-2.5 rounded-xl px-3 py-2 transition-colors",
-                        active ? "bg-white shadow-soft ring-1 ring-grape-100" : "hover:bg-white/70",
+                        active ? "bg-white shadow-soft ring-1 ring-brand-100" : "hover:bg-white/70",
                       )}
                     >
                       <span className="text-base">{s.mode === "fact" ? "⚡" : s.mode === "concept" ? "🔭" : "🧩"}</span>
                       <span className="min-w-0 flex-1">
-                        <span className={clsx("block truncate text-sm font-bold", active ? "text-grape-700" : "text-ink")}>{s.title}</span>
+                        <span className={clsx("block truncate text-sm font-bold", active ? "text-brand-700" : "text-ink")}>{s.title}</span>
                         <span className="block truncate text-xs text-ink-muted">{s.topic || s.subject}</span>
                       </span>
                       <span
@@ -234,14 +234,14 @@ function HistoryPanel({ onClose, closeIcon }: { onClose: () => void; closeIcon: 
       <div className="border-t border-line p-3">
         <div className="mb-3 grid grid-cols-4 gap-1">
           {QUICK_LINKS.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} className="flex flex-col items-center gap-1 rounded-xl py-2 text-[11px] font-bold text-ink-soft hover:bg-white hover:text-grape-600" title={t(label)}>
+            <Link key={href} href={href} className="flex flex-col items-center gap-1 rounded-xl py-2 text-[11px] font-bold text-ink-soft hover:bg-white hover:text-brand-600" title={t(label)}>
               <Icon size={18} />
               <span className="max-w-full truncate px-1">{t(label)}</span>
             </Link>
           ))}
         </div>
-        <Link href="/profile" className="flex items-center gap-3 rounded-2xl bg-white p-2.5 shadow-soft hover:ring-1 hover:ring-grape-100">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-grape-50">
+        <Link href="/profile" className="flex items-center gap-3 rounded-2xl bg-white p-2.5 shadow-soft hover:ring-1 hover:ring-brand-100">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-50">
             <ProggaBot size={32} float={false} palette={user.skin?.palette ?? paletteFor(user.avatarSkin)} />
           </span>
           <span className="min-w-0 flex-1">

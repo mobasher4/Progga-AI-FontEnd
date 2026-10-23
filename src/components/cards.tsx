@@ -71,7 +71,7 @@ export function LessonTile({ lesson }: { lesson: LessonCard }) {
           <Clock size={12} /> {duration(lesson.durationSec)}
         </span>
         <span className="absolute inset-0 grid place-items-center opacity-0 transition-opacity group-hover:opacity-100">
-          <span className="grid h-14 w-14 place-items-center rounded-full bg-white text-grape-600 shadow-lift">
+          <span className="grid h-14 w-14 place-items-center rounded-full bg-white text-brand-600 shadow-lift">
             <Play size={24} fill="currentColor" />
           </span>
         </span>
@@ -88,7 +88,7 @@ export function LessonTile({ lesson }: { lesson: LessonCard }) {
           {lesson.progress !== undefined && lesson.progress > 0 && !lesson.completed ? (
             <ProgressBar value={lesson.progress} height="h-2" color="bg-coral-500" track="bg-coral-50" />
           ) : (
-            <span className="text-sm font-extrabold text-grape-500">+{n(lesson.xpReward)} XP</span>
+            <span className="text-sm font-extrabold text-brand-500">+{n(lesson.xpReward)} XP</span>
           )}
         </div>
       </div>
@@ -114,7 +114,7 @@ export function SessionRow({ s }: { s: SessionSummary }) {
         : t("cards.stepOf", { n: Math.min(s.currentStep + 1, s.totalSteps), total: s.totalSteps });
   return (
     <Link href={`/tutor/${s.id}`} className="flex items-center gap-3 rounded-2xl p-3 transition-colors hover:bg-cream">
-      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-grape-50 text-xl">{s.mode === "fact" ? "⚡" : s.mode === "concept" ? "🔭" : "🧩"}</span>
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-50 text-xl">{s.mode === "fact" ? "⚡" : s.mode === "concept" ? "🔭" : "🧩"}</span>
       <div className="min-w-0 flex-1">
         <p className="truncate font-display font-bold">{s.title}</p>
         <p className="truncate text-sm text-ink-muted">

@@ -56,13 +56,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               href={href}
               className={clsx(
                 "group flex items-center gap-3 rounded-2xl px-3.5 py-3 font-display text-[1.05rem] font-bold transition-colors",
-                active(href) ? "bg-grape-50 text-grape-600" : "text-ink-soft hover:bg-cream hover:text-ink",
+                active(href) ? "bg-brand-50 text-brand-600" : "text-ink-soft hover:bg-cream hover:text-ink",
               )}
             >
               <span
                 className={clsx(
                   "grid h-9 w-9 shrink-0 place-items-center rounded-xl transition-colors",
-                  active(href) ? "bg-grape-500 text-white shadow-[0_3px_0_0_var(--color-grape-700)]" : "bg-cream text-ink-soft group-hover:bg-white",
+                  active(href) ? "bg-brand-500 text-white shadow-[0_3px_0_0_var(--color-brand-700)]" : "bg-cream text-ink-soft group-hover:bg-white",
                 )}
               >
                 <Icon size={19} strokeWidth={2.4} />
@@ -71,12 +71,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
           ))}
         </nav>
-        <div className="rounded-3xl bg-gradient-to-br from-grape-500 to-grape-700 p-4 text-white">
+        <div className="rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 p-4 text-white">
           <div className="flex items-center gap-3">
             <ProggaBot size={46} float={false} palette={user.skin?.palette ?? paletteFor(user.avatarSkin)} />
             <div className="min-w-0">
               <p className="truncate font-display font-bold leading-tight">{user.name}</p>
-              <p className="text-xs text-grape-100">{gradeLabel(user.grade)}</p>
+              <p className="text-xs text-brand-100">{gradeLabel(user.grade)}</p>
             </div>
           </div>
           <button onClick={logout} className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-white/15 py-2 text-sm font-bold hover:bg-white/25">
@@ -94,8 +94,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-md justify-between">
           {MOBILE_NAV.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} className={clsx("flex min-w-0 flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-bold", active(href) ? "text-grape-600" : "text-ink-muted")}>
-              <span className={clsx("grid h-8 w-12 place-items-center rounded-full transition-colors", active(href) && "bg-grape-100")}>
+            <Link key={href} href={href} className={clsx("flex min-w-0 flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-bold", active(href) ? "text-brand-600" : "text-ink-muted")}>
+              <span className={clsx("grid h-8 w-12 place-items-center rounded-full transition-colors", active(href) && "bg-brand-100")}>
                 <Icon size={20} strokeWidth={2.4} />
               </span>
               <span className="max-w-full truncate px-0.5">{t(label)}</span>
@@ -117,7 +117,7 @@ function TopBar({ user }: { user: User }) {
           <Logo size={30} />
         </Link>
         <div className="hidden min-w-0 flex-1 items-center gap-3 lg:flex">
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-grape-500 font-display text-lg font-extrabold text-white shadow-[0_3px_0_0_var(--color-grape-700)]">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-500 font-display text-lg font-extrabold text-white shadow-[0_3px_0_0_var(--color-brand-700)]">
             {n(lvl.level)}
           </div>
           <div className="w-full max-w-xs">
@@ -127,8 +127,8 @@ function TopBar({ user }: { user: User }) {
                 {n(lvl.xp - lvl.levelStartXp)}/{n(lvl.nextLevelXp - lvl.levelStartXp)} XP
               </span>
             </div>
-            <div className="mt-1 h-2.5 overflow-hidden rounded-full bg-grape-100">
-              <div className="h-full rounded-full bg-gradient-to-r from-grape-400 to-grape-600 transition-[width] duration-700" style={{ width: `${lvl.progress * 100}%` }} />
+            <div className="mt-1 h-2.5 overflow-hidden rounded-full bg-brand-100">
+              <div className="h-full rounded-full bg-gradient-to-r from-brand-400 to-brand-600 transition-[width] duration-700" style={{ width: `${lvl.progress * 100}%` }} />
             </div>
           </div>
         </div>

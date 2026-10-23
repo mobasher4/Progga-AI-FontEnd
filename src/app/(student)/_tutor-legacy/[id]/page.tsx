@@ -173,13 +173,13 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
         <div className="sticky top-24 space-y-4">
           <div className="card flex flex-col items-center p-5 text-center">
             <ProggaBot size={150} mood={mood} palette={palette} />
-            <p className="mt-2 rounded-2xl bg-grape-50 px-3 py-2 font-display font-bold text-grape-700">{line}</p>
+            <p className="mt-2 rounded-2xl bg-brand-50 px-3 py-2 font-display font-bold text-brand-700">{line}</p>
           </div>
           {isFact ? (
             <div className="card p-5">
               <p className="eyebrow mb-2">{t("session.quickTitle")}</p>
               <p className="text-sm text-ink-soft">{t("session.quickBody")}</p>
-              <p className="mt-3 rounded-2xl bg-grape-50 p-3 text-sm font-semibold text-grape-700">{t("session.quickTip")}</p>
+              <p className="mt-3 rounded-2xl bg-brand-50 p-3 text-sm font-semibold text-brand-700">{t("session.quickTip")}</p>
             </div>
           ) : (
             <div className="card p-5">
@@ -189,7 +189,7 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
           )}
           <div className={clsx("grid grid-cols-2 gap-3", isFact && "hidden")}>
             <div className="card p-3 text-center">
-              <p className="font-display text-2xl font-extrabold text-grape-600">{n(session.xpEarned)}</p>
+              <p className="font-display text-2xl font-extrabold text-brand-600">{n(session.xpEarned)}</p>
               <p className="text-xs font-bold text-ink-muted">{t("session.xpEarned")}</p>
             </div>
             <div className="card p-3 text-center">
@@ -246,14 +246,14 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
             {showKeys && (
               <div className="mb-2 flex flex-wrap gap-1.5">
                 {SYMBOLS.map((s) => (
-                  <button key={s} type="button" onClick={() => insert(s)} className="h-9 min-w-9 rounded-xl border-2 border-line bg-white px-2 font-display text-lg font-bold hover:border-grape-300 hover:bg-grape-50">
+                  <button key={s} type="button" onClick={() => insert(s)} className="h-9 min-w-9 rounded-xl border-2 border-line bg-white px-2 font-display text-lg font-bold hover:border-brand-300 hover:bg-brand-50">
                     {s}
                   </button>
                 ))}
               </div>
             )}
             <div className="flex items-end gap-2">
-              <div className="flex flex-1 items-end rounded-2xl border-2 border-line bg-white transition-colors focus-within:border-grape-400 focus-within:ring-4 focus-within:ring-grape-100">
+              <div className="flex flex-1 items-end rounded-2xl border-2 border-line bg-white transition-colors focus-within:border-brand-400 focus-within:ring-4 focus-within:ring-brand-100">
                 <textarea
                   ref={inputRef}
                   value={text}
@@ -275,7 +275,7 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
                 <button
                   type="button"
                   onClick={() => setShowKeys((v) => !v)}
-                  className={clsx("m-1.5 grid h-9 w-9 place-items-center rounded-xl font-display font-extrabold", showKeys ? "bg-grape-100 text-grape-700" : "text-ink-muted hover:bg-cream")}
+                  className={clsx("m-1.5 grid h-9 w-9 place-items-center rounded-xl font-display font-extrabold", showKeys ? "bg-brand-100 text-brand-700" : "text-ink-muted hover:bg-cream")}
                   title={t("session.symbols")}
                 >
                   ±

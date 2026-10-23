@@ -16,7 +16,7 @@ import { useMe } from "@/lib/useMe";
 
 const TIME_LIMIT = 15;
 const OPTION_STYLES = [
-  "border-grape-200 bg-grape-50 hover:bg-grape-100 [&>span]:bg-grape-500",
+  "border-brand-200 bg-brand-50 hover:bg-brand-100 [&>span]:bg-brand-500",
   "border-banana-200 bg-banana-50 hover:bg-banana-100 [&>span]:bg-banana-500",
   "border-mint-100 bg-mint-50 hover:bg-mint-100 [&>span]:bg-mint-500",
   "border-sky-100 bg-sky-50 hover:bg-sky-100 [&>span]:bg-sky-500",
@@ -75,7 +75,7 @@ export default function ArenaPage() {
 
   return (
     <div className="space-y-8">
-      <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-ink via-grape-900 to-grape-700 p-6 text-white sm:p-8">
+      <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-ink via-brand-900 to-brand-700 p-6 text-white sm:p-8">
         <div className="bg-dots absolute inset-0 opacity-20 [filter:invert(1)]" />
         <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center">
           <ProggaBot size={130} mood="cheer" palette={user?.skin?.palette ?? paletteFor(user?.avatarSkin)} />
@@ -113,7 +113,7 @@ export default function ArenaPage() {
                 <p className="font-display text-lg font-extrabold">{ui === "bn" ? s.nameBn : s.name}</p>
                 <p className="text-sm text-ink-muted">{ui === "bn" ? s.name : s.nameBn}</p>
               </div>
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-grape-50 text-grape-600 transition-colors group-hover:bg-grape-500 group-hover:text-white">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600 transition-colors group-hover:bg-brand-500 group-hover:text-white">
                 {starting === s.id ? <Spinner size={18} /> : <ArrowRight size={18} />}
               </span>
             </button>
@@ -206,13 +206,13 @@ function Round({ game, onExit, onReplay }: { game: Game; onExit: () => void; onR
               </motion.span>
             )}
           </AnimatePresence>
-          <span className="chip border-grape-100 bg-white font-display text-lg text-grape-600">{n(attempt.score)}</span>
+          <span className="chip border-brand-100 bg-white font-display text-lg text-brand-600">{n(attempt.score)}</span>
         </div>
       </div>
 
       <div className="flex items-center gap-3">
         <span className="text-sm font-extrabold text-ink-muted">Q{n(index + 1)}/{n(game.questions.length)}</span>
-        <ProgressBar value={left / TIME_LIMIT} height="h-3" color={left < 5 ? "bg-coral-500" : "bg-grape-500"} className="flex-1" />
+        <ProgressBar value={left / TIME_LIMIT} height="h-3" color={left < 5 ? "bg-coral-500" : "bg-brand-500"} className="flex-1" />
         <span className={clsx("flex w-12 items-center gap-1 text-sm font-extrabold", left < 5 ? "text-coral-600" : "text-ink-muted")}>
           <Timer size={15} /> {n(Math.ceil(left))}
         </span>
@@ -300,7 +300,7 @@ function Results({ game, result, onExit, onReplay }: { game: Game; result: Answe
           ))}
         </div>
         {result.rewards && (
-          <p className="mt-5 font-display text-lg font-extrabold text-grape-600">
+          <p className="mt-5 font-display text-lg font-extrabold text-brand-600">
             +{n(result.rewards.xpGained)} XP · +{n(result.rewards.coinsGained)} 🍌
           </p>
         )}

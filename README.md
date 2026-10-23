@@ -34,6 +34,6 @@ The app proxies `/api/*` to `BACKEND_URL` (see `next.config.ts`), so the httpOnl
 
 ## Design
 
-- Playful palette (grape, banana, mint) on a warm cream canvas; tokens live in `src/app/globals.css`.
+- Playful palette (brand blue, banana, mint) on a warm cream canvas; tokens live in `src/app/globals.css`.
 - `src/components/brand/ProggaBot.tsx`: the animated robot mascot. Its eyes, brows and mouth morph smoothly between moods (idle, thinking, asking, happy, cheer, oops), and skins are bought with Kola coins 🍌.
 - `src/components/brand/Logo.tsx` and `public/brand/`: robot-with-banana logo.

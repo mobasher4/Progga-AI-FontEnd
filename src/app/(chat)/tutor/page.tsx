@@ -109,7 +109,7 @@ function NewChat() {
 
             <div className="mt-6 grid w-full gap-3 sm:grid-cols-2">
               {[
-                ["🧩", "chatui.stepMode", "chatui.stepModeText", "bg-grape-50 text-grape-700"],
+                ["🧩", "chatui.stepMode", "chatui.stepModeText", "bg-brand-50 text-brand-700"],
                 ["⚡", "chatui.factMode", "chatui.factModeText", "bg-sky-50 text-sky-600"],
               ].map(([icon, title, text, tint]) => (
                 <div key={title} className="flex items-start gap-3 rounded-2xl border border-line bg-cream/60 p-3.5 text-left">
@@ -128,10 +128,10 @@ function NewChat() {
                 <button
                   key={ex}
                   onClick={() => submit(ex)}
-                  className="group flex items-center justify-between gap-3 rounded-2xl border border-line bg-white px-4 py-3 text-left text-[15px] font-semibold shadow-soft transition-all hover:-translate-y-0.5 hover:border-grape-200"
+                  className="group flex items-center justify-between gap-3 rounded-2xl border border-line bg-white px-4 py-3 text-left text-[15px] font-semibold shadow-soft transition-all hover:-translate-y-0.5 hover:border-brand-200"
                 >
                   <span>{ex}</span>
-                  <ArrowUpRight size={17} className="shrink-0 text-ink-muted transition-colors group-hover:text-grape-500" />
+                  <ArrowUpRight size={17} className="shrink-0 text-ink-muted transition-colors group-hover:text-brand-500" />
                 </button>
               ))}
             </div>
@@ -149,7 +149,7 @@ function NewChat() {
             )}
             {busy && (
               <div className="flex items-center gap-3">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-grape-50">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50">
                   <ProggaMark size={28} />
                 </span>
                 <AnimatePresence mode="wait">
@@ -158,7 +158,7 @@ function NewChat() {
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
-                    className="rounded-2xl bg-grape-50 px-4 py-2.5 font-display font-bold text-grape-700"
+                    className="rounded-2xl bg-brand-50 px-4 py-2.5 font-display font-bold text-brand-700"
                   >
                     {t(PLANNING_LINES[line])}
                   </motion.span>

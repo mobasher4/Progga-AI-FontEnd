@@ -66,11 +66,11 @@ export function CourseCard({ course, grade }: { course: CourseCardData; grade: n
               <ProgressBar value={course.completed / Math.max(1, course.topics)} height="h-2" color="bg-mint-500" track="bg-mint-50" />
               <p className="mt-1.5 flex items-center justify-between text-xs font-bold text-ink-muted">
                 {t("lessons.courseDone", { a: course.completed, b: course.topics })}
-                <span className="flex items-center gap-1 text-grape-600">{t("lessons.continueCourse")} <ArrowRight size={13} /></span>
+                <span className="flex items-center gap-1 text-brand-600">{t("lessons.continueCourse")} <ArrowRight size={13} /></span>
               </p>
             </>
           ) : (
-            <span className="flex items-center gap-1 text-sm font-extrabold text-grape-600">
+            <span className="flex items-center gap-1 text-sm font-extrabold text-brand-600">
               {t("lessons.startCourse")} <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
             </span>
           )}

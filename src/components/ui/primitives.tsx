@@ -7,8 +7,8 @@ import { useT } from "@/i18n";
 export function ProgressBar({
   value,
   className,
-  color = "bg-grape-500",
-  track = "bg-grape-100",
+  color = "bg-brand-500",
+  track = "bg-brand-100",
   height = "h-3",
 }: {
   value: number;
@@ -36,7 +36,7 @@ export function PageLoader({ label }: { label?: string }) {
   return (
     <div className="grid min-h-[50vh] place-items-center">
       <div className="flex items-center gap-3 font-display text-lg font-bold text-ink-soft">
-        <Spinner className="text-grape-500" /> {label ?? t("common.loading")}
+        <Spinner className="text-brand-500" /> {label ?? t("common.loading")}
       </div>
     </div>
   );

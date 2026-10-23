@@ -26,7 +26,7 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-grape-500 via-grape-600 to-grape-700 p-6 text-white sm:p-8">
+      <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-brand-500 via-brand-600 to-brand-700 p-6 text-white sm:p-8">
         <div className="bg-dots absolute inset-0 opacity-25" />
         <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-banana-300/30 blur-3xl" />
         <div className="relative flex flex-col items-start gap-6 sm:flex-row sm:items-center">
@@ -34,9 +34,9 @@ export default function HomePage() {
             <ProggaBot size={130} mood="happy" palette={user.skin?.palette ?? paletteFor(user.avatarSkin)} />
           </div>
           <div className="flex-1">
-            <p className="font-bold text-grape-100">{t("home.hi", { greeting: greeting(), name: firstName(user.name) })}</p>
+            <p className="font-bold text-brand-100">{t("home.hi", { greeting: greeting(), name: firstName(user.name) })}</p>
             <h1 className="mt-1 text-3xl font-extrabold leading-tight sm:text-4xl">{t("home.title")}</h1>
-            <p className="mt-2 max-w-lg text-grape-100">{t("home.body")}</p>
+            <p className="mt-2 max-w-lg text-brand-100">{t("home.body")}</p>
             <div className="mt-5 flex flex-wrap gap-3">
               <Link href="/tutor" className="btn-banana">
                 <Sparkles size={19} /> {t("home.ask")}
@@ -83,7 +83,7 @@ export default function HomePage() {
           <SectionTitle
             eyebrow={t("home.trailEyebrow")}
             title={t("home.recent")}
-            action={<Link href="/tutor" className="shrink-0 text-sm font-bold text-grape-600 hover:underline">{t("common.seeAll")}</Link>}
+            action={<Link href="/tutor" className="shrink-0 text-sm font-bold text-brand-600 hover:underline">{t("common.seeAll")}</Link>}
           />
           {data.recentSessions.length ? (
             <div className="-mx-3 space-y-1">{data.recentSessions.map((s) => <SessionRow key={s.id} s={s} />)}</div>
@@ -119,7 +119,7 @@ export default function HomePage() {
           eyebrow={data.continueLessons.length ? t("home.continueEyebrow") : t("home.pickedEyebrow")}
           title={data.continueLessons.length ? t("home.continue") : t("home.videoLessons")}
           action={
-            <Link href="/lessons" className="flex shrink-0 items-center gap-1 text-sm font-bold text-grape-600 hover:underline">
+            <Link href="/lessons" className="flex shrink-0 items-center gap-1 text-sm font-bold text-brand-600 hover:underline">
               {t("home.allLessons")} <ArrowRight size={15} />
             </Link>
           }

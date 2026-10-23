@@ -44,10 +44,10 @@ function Nav() {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6">
         <Logo size={36} />
         <nav className="hidden items-center gap-7 font-display font-bold text-ink-soft lg:flex">
-          <a href="#how" className="hover:text-grape-600">{t("landing.navHow")}</a>
-          <a href="#features" className="hover:text-grape-600">{t("landing.navFeatures")}</a>
-          <a href="#safety" className="hover:text-grape-600">{t("landing.navSafety")}</a>
-          <a href="#parents" className="hover:text-grape-600">{t("landing.navParents")}</a>
+          <a href="#how" className="hover:text-brand-600">{t("landing.navHow")}</a>
+          <a href="#features" className="hover:text-brand-600">{t("landing.navFeatures")}</a>
+          <a href="#safety" className="hover:text-brand-600">{t("landing.navSafety")}</a>
+          <a href="#parents" className="hover:text-brand-600">{t("landing.navParents")}</a>
         </nav>
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
@@ -65,16 +65,16 @@ function Hero() {
     <section className="relative">
       <div className="bg-dots absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
       <div className="absolute -right-32 -top-32 -z-10 h-[520px] w-[520px] rounded-full bg-banana-200/50 blur-3xl" />
-      <div className="absolute -left-40 top-40 -z-10 h-[420px] w-[420px] rounded-full bg-grape-200/40 blur-3xl" />
+      <div className="absolute -left-40 top-40 -z-10 h-[420px] w-[420px] rounded-full bg-brand-200/40 blur-3xl" />
 
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-14 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:pt-20">
         <div>
-          <span className="chip border-grape-100 bg-white text-grape-600">
+          <span className="chip border-brand-100 bg-white text-brand-600">
             <span className="h-2 w-2 rounded-full bg-mint-500" /> {t("landing.chip")}
           </span>
           <h1 className="mt-5 text-5xl font-extrabold leading-[1.08] sm:text-6xl lg:text-[4.2rem]">
             {t("landing.titleA")}{" "}
-            <span className="relative inline-block text-grape-500">
+            <span className="relative inline-block text-brand-500">
               {t("landing.think")}
               <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 14" preserveAspectRatio="none" aria-hidden>
                 <path d="M3 10 Q100 -2 197 9" stroke="#FFD43B" strokeWidth="8" strokeLinecap="round" fill="none" />
@@ -122,8 +122,8 @@ function HeroVisual() {
         </div>
         <div className="mb-4 flex gap-1.5">
           <span className="h-2 flex-1 rounded-full bg-mint-500" />
-          <span className="h-2 flex-1 rounded-full bg-grape-500" />
-          <span className="h-2 flex-1 rounded-full bg-grape-100" />
+          <span className="h-2 flex-1 rounded-full bg-brand-500" />
+          <span className="h-2 flex-1 rounded-full bg-brand-100" />
         </div>
         <div className="space-y-2.5 text-[15px]">
           <Bubble me>{t("landing.demoQ")}</Bubble>
@@ -136,7 +136,7 @@ function HeroVisual() {
           <Bubble question label={t("landing.demoYourTurn")}>{t("landing.demoAsk")}</Bubble>
         </div>
       </div>
-      <div className="absolute -right-3 -top-5 animate-float rounded-2xl bg-grape-500 px-3.5 py-2 font-display font-extrabold text-white shadow-lift">⭐ +15 XP</div>
+      <div className="absolute -right-3 -top-5 animate-float rounded-2xl bg-brand-500 px-3.5 py-2 font-display font-extrabold text-white shadow-lift">⭐ +15 XP</div>
       <div className="absolute -bottom-5 left-4 animate-float rounded-2xl bg-white px-3.5 py-2 font-display font-extrabold text-coral-600 shadow-lift [animation-delay:1.2s]">
         {t("landing.demoStreak")}
       </div>
@@ -145,7 +145,7 @@ function HeroVisual() {
 }
 
 function Bubble({ children, me, question, label }: { children: React.ReactNode; me?: boolean; question?: boolean; label?: string }) {
-  if (me) return <div className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-md bg-grape-500 px-3.5 py-2 font-semibold text-white">{children}</div>;
+  if (me) return <div className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-md bg-brand-500 px-3.5 py-2 font-semibold text-white">{children}</div>;
   return (
     <div className={`w-fit max-w-[88%] rounded-2xl rounded-bl-md px-3.5 py-2 ${question ? "border-2 border-banana-300 bg-banana-50" : "bg-cream"}`}>
       {question && <p className="text-xs font-extrabold uppercase tracking-wider text-banana-700">{label}</p>}
@@ -178,7 +178,7 @@ function Compare() {
             ))}
           </ul>
         </div>
-        <div className="card relative overflow-hidden border-2 border-grape-200 p-7">
+        <div className="card relative overflow-hidden border-2 border-brand-200 p-7">
           <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-banana-200/60 blur-2xl" />
           <div className="relative flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-2xl bg-mint-100 text-mint-600"><Check strokeWidth={3} size={20} /></span>
@@ -186,8 +186,8 @@ function Compare() {
           </div>
           <ol className="relative mt-5 space-y-2 text-sm">
             {(["landing.step1", "landing.step2", "landing.step3"] as const).map((k, i) => (
-              <li key={k} className="flex items-center gap-3 rounded-2xl bg-grape-50 px-3.5 py-2.5 font-semibold">
-                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-grape-500 text-xs font-extrabold text-white">{i + 1}</span>
+              <li key={k} className="flex items-center gap-3 rounded-2xl bg-brand-50 px-3.5 py-2.5 font-semibold">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-500 text-xs font-extrabold text-white">{i + 1}</span>
                 {t(k)}
               </li>
             ))}
@@ -206,7 +206,7 @@ function Compare() {
 function HowItWorks() {
   const { t } = useT();
   const steps: { icon: typeof Lightbulb; title: TKey; text: TKey; color: string }[] = [
-    { icon: MessageCircleQuestion, title: "landing.how1t", text: "landing.how1d", color: "bg-grape-500" },
+    { icon: MessageCircleQuestion, title: "landing.how1t", text: "landing.how1d", color: "bg-brand-500" },
     { icon: Lightbulb, title: "landing.how2t", text: "landing.how2d", color: "bg-banana-500" },
     { icon: HeartHandshake, title: "landing.how3t", text: "landing.how3d", color: "bg-mint-500" },
     { icon: Crown, title: "landing.how4t", text: "landing.how4d", color: "bg-coral-500" },
@@ -236,13 +236,13 @@ function HowItWorks() {
 function Features() {
   const { t } = useT();
   const features: { icon: typeof Camera; title: TKey; text: TKey; tint: string }[] = [
-    { icon: MessageCircleQuestion, title: "landing.f1t", text: "landing.f1d", tint: "bg-grape-50 text-grape-600" },
+    { icon: MessageCircleQuestion, title: "landing.f1t", text: "landing.f1d", tint: "bg-brand-50 text-brand-600" },
     { icon: Camera, title: "landing.f2t", text: "landing.f2d", tint: "bg-sky-50 text-sky-600" },
     { icon: PlayCircle, title: "landing.f3t", text: "landing.f3d", tint: "bg-coral-50 text-coral-600" },
     { icon: Swords, title: "landing.f4t", text: "landing.f4d", tint: "bg-banana-50 text-banana-700" },
     { icon: Flame, title: "landing.f5t", text: "landing.f5d", tint: "bg-coral-50 text-coral-600" },
     { icon: Crown, title: "landing.f6t", text: "landing.f6d", tint: "bg-mint-50 text-mint-600" },
-    { icon: Users, title: "landing.f7t", text: "landing.f7d", tint: "bg-grape-50 text-grape-600" },
+    { icon: Users, title: "landing.f7t", text: "landing.f7d", tint: "bg-brand-50 text-brand-600" },
     { icon: ShieldCheck, title: "landing.f8t", text: "landing.f8d", tint: "bg-mint-50 text-mint-600" },
   ];
   return (
@@ -270,7 +270,7 @@ function Levels() {
     { range: "landing.band1Range", name: "landing.band1Name", text: "landing.band1Text", color: "from-banana-300 to-banana-500", mood: "happy" as const },
     { range: "landing.band2Range", name: "landing.band2Name", text: "landing.band2Text", color: "from-mint-400 to-mint-600", mood: "talking" as const },
     { range: "landing.band3Range", name: "landing.band3Name", text: "landing.band3Text", color: "from-sky-400 to-sky-600", mood: "thinking" as const },
-    { range: "landing.band4Range", name: "landing.band4Name", text: "landing.band4Text", color: "from-grape-400 to-grape-700", mood: "idle" as const },
+    { range: "landing.band4Range", name: "landing.band4Name", text: "landing.band4Text", color: "from-brand-400 to-brand-700", mood: "idle" as const },
   ] satisfies { range: TKey; name: TKey; text: TKey; color: string; mood: string }[];
   return (
     <section className="bg-white py-20">
@@ -337,13 +337,13 @@ function ParentsCta() {
   const { t } = useT();
   return (
     <section id="parents" className="px-4 pb-20 sm:px-6">
-      <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-grape-600 via-grape-500 to-grape-700 px-8 py-14 text-white sm:px-14">
+      <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-brand-600 via-brand-500 to-brand-700 px-8 py-14 text-white sm:px-14">
         <div className="bg-dots absolute inset-0 opacity-30" />
         <div className="relative grid items-center gap-10 lg:grid-cols-[1.4fr_1fr]">
           <div>
             <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-banana-300">{t("landing.parentsEyebrow")}</p>
             <h2 className="mt-2 text-4xl font-extrabold sm:text-5xl">{t("landing.parentsTitle")}</h2>
-            <p className="mt-4 max-w-xl text-lg text-grape-100">{t("landing.parentsBody")}</p>
+            <p className="mt-4 max-w-xl text-lg text-brand-100">{t("landing.parentsBody")}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/signup?role=PARENT" className="btn-banana text-lg">{t("landing.parentsCta")}</Link>
               <Link href="/signup?role=TEACHER" className="btn bg-white/15 text-white hover:bg-white/25">{t("landing.parentsTeacher")}</Link>

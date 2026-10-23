@@ -212,7 +212,7 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
             )}
             <button
               onClick={() => setPanelOpen((v) => !v)}
-              className={clsx("grid h-10 w-10 place-items-center rounded-xl transition-colors", panelOpen ? "bg-grape-50 text-grape-600" : "text-ink-soft hover:bg-cream")}
+              className={clsx("grid h-10 w-10 place-items-center rounded-xl transition-colors", panelOpen ? "bg-brand-50 text-brand-600" : "text-ink-soft hover:bg-cream")}
               aria-label={panelOpen ? t("chatui.hideProgress") : t("chatui.showProgress")}
               title={panelOpen ? t("chatui.hideProgress") : t("chatui.showProgress")}
             >
@@ -262,7 +262,7 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
                       {t("session.showStep")}
                     </ActionChip>
                   )}
-                  <span className="ml-auto rounded-full bg-grape-50 px-3 py-1 text-xs font-extrabold text-grape-600">
+                  <span className="ml-auto rounded-full bg-brand-50 px-3 py-1 text-xs font-extrabold text-brand-600">
                     {t("session.stepOf", { n: Math.min(session.currentStep + 1, session.totalSteps), total: session.totalSteps })}
                   </span>
                   <AnswerOptions
@@ -355,7 +355,7 @@ function ActionChip({
       disabled={disabled}
       className={clsx(
         "inline-flex max-w-full items-center gap-1.5 truncate rounded-full border px-3.5 py-1.5 text-sm font-bold transition-colors disabled:opacity-50",
-        highlight ? "border-banana-300 bg-banana-50 text-ink hover:bg-banana-100" : "border-line bg-white text-ink-soft hover:border-grape-200 hover:text-ink",
+        highlight ? "border-banana-300 bg-banana-50 text-ink hover:bg-banana-100" : "border-line bg-white text-ink-soft hover:border-brand-200 hover:text-ink",
       )}
     >
       {icon}
@@ -396,7 +396,7 @@ function ProgressPanel({
 
       <div className="card flex flex-col items-center p-4 text-center">
         <ProggaBot size={130} mood={mood} palette={palette} />
-        <p className="mt-2 rounded-2xl bg-grape-50 px-3 py-2 text-sm font-display font-bold text-grape-700">{line}</p>
+        <p className="mt-2 rounded-2xl bg-brand-50 px-3 py-2 text-sm font-display font-bold text-brand-700">{line}</p>
       </div>
 
       {videos.length > 0 && <RelatedVideosCard videos={videos} />}
@@ -405,7 +405,7 @@ function ProgressPanel({
         <div className="card p-4">
           <p className="eyebrow mb-2">{t("session.quickTitle")}</p>
           <p className="text-sm text-ink-soft">{t("session.quickBody")}</p>
-          <p className="mt-3 rounded-2xl bg-grape-50 p-3 text-sm font-semibold text-grape-700">{t("session.quickTip")}</p>
+          <p className="mt-3 rounded-2xl bg-brand-50 p-3 text-sm font-semibold text-brand-700">{t("session.quickTip")}</p>
         </div>
       ) : (
         <>
@@ -415,7 +415,7 @@ function ProgressPanel({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="card p-3 text-center">
-              <p className="font-display text-2xl font-extrabold text-grape-600">{xp}</p>
+              <p className="font-display text-2xl font-extrabold text-brand-600">{xp}</p>
               <p className="text-xs font-bold text-ink-muted">{t("session.xpEarned")}</p>
             </div>
             <div className="card p-3 text-center">

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     "Progga is a safe AI tutor for students from Class 3 to HSC. Instead of handing out answers, it guides students step by step with questions, hints and the 'why' behind every move.",
 };
 
-export const viewport: Viewport = { themeColor: "#6C4CF1" };
+export const viewport: Viewport = { themeColor: "#2B7BE8" };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // Read the language on the server so the first paint is already in the right language.

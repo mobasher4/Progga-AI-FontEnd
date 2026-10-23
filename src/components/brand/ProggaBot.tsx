@@ -152,7 +152,7 @@ export function ProggaBot({ mood = "idle", palette = SKIN_PALETTES.classic, size
       </defs>
 
       {/* soft floor shadow */}
-      <ellipse cx="100" cy="218" rx="46" ry="5" fill="#1E1B3A" opacity="0.08" />
+      <ellipse cx="100" cy="218" rx="46" ry="5" fill="#0F1E3D" opacity="0.08" />
 
       {/* body (stays upright while the head tilts) */}
       <rect x="86" y="163" width="28" height="10" rx="3" fill={p.visor} />

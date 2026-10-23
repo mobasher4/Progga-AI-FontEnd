@@ -41,7 +41,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
     const chosen = OPTIONS.find((o) => o.id === id)!;
     await setLang(id);
     // language names read the same in every dictionary, so this is correct before the re-render
-    toast(t(chosen.label), "🌐", "grape");
+    toast(t(chosen.label), "🌐", "brand");
   }
 
   return (
@@ -50,14 +50,14 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={clsx(
-          "flex items-center gap-1.5 rounded-2xl border-2 border-line bg-white font-display font-extrabold text-ink transition-colors hover:border-grape-200 hover:bg-grape-50",
+          "flex items-center gap-1.5 rounded-2xl border-2 border-line bg-white font-display font-extrabold text-ink transition-colors hover:border-brand-200 hover:bg-brand-50",
           compact ? "h-11 px-2.5" : "px-3 py-2",
         )}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={t("lang.label")}
       >
-        <Languages size={17} className="text-grape-500" />
+        <Languages size={17} className="text-brand-500" />
         <span className="text-sm">{t(current.short)}</span>
         <ChevronDown size={15} className={clsx("text-ink-muted transition-transform", open && "rotate-180")} />
       </button>
@@ -80,14 +80,14 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
                   role="option"
                   aria-selected={o.id === lang}
                   onClick={() => choose(o.id)}
-                  className={clsx("flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors", o.id === lang ? "bg-grape-50" : "hover:bg-cream")}
+                  className={clsx("flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors", o.id === lang ? "bg-brand-50" : "hover:bg-cream")}
                 >
                   <span className={clsx("grid h-9 w-9 shrink-0 place-items-center rounded-xl font-display text-base font-extrabold", o.tint)}>{o.badge}</span>
                   <span className="min-w-0 flex-1">
                     <span className="block font-display font-extrabold leading-tight">{t(o.label)}</span>
                     <span className="block text-xs text-ink-muted">{t(o.hint)}</span>
                   </span>
-                  {o.id === lang && <Check size={17} className="shrink-0 text-grape-600" />}
+                  {o.id === lang && <Check size={17} className="shrink-0 text-brand-600" />}
                 </button>
               </li>
             ))}

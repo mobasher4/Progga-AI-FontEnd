@@ -29,14 +29,14 @@ export function MissionMap({ session }: { session: TutorSession }) {
                 "relative z-10 grid h-9 w-9 shrink-0 place-items-center rounded-full border-[3px] font-display text-sm font-extrabold",
                 s.state === "done" && "border-mint-500 bg-mint-500 text-white",
                 s.state === "revealed" && "border-sky-400 bg-sky-400 text-white",
-                s.state === "current" && "border-grape-500 bg-white text-grape-600",
+                s.state === "current" && "border-brand-500 bg-white text-brand-600",
                 s.state === "locked" && "border-line bg-cream text-ink-muted",
               )}
             >
               {s.state === "done" ? <Check size={17} strokeWidth={3.5} /> : s.state === "revealed" ? <Eye size={16} /> : s.state === "locked" ? <Lock size={14} /> : n(i + 1)}
               {s.state === "current" && (
                 <motion.span
-                  className="absolute inset-[-6px] rounded-full border-2 border-grape-300"
+                  className="absolute inset-[-6px] rounded-full border-2 border-brand-300"
                   animate={{ scale: [1, 1.18, 1], opacity: [0.8, 0, 0.8] }}
                   transition={{ duration: 1.8, repeat: Infinity }}
                 />

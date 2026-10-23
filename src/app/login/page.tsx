@@ -68,7 +68,7 @@ function LoginForm() {
       </form>
 
       <p className="mt-6 text-center text-ink-soft">
-        {t("auth.newHere")} <Link href="/signup" className="font-bold text-grape-600 hover:underline">{t("auth.createAccount")}</Link>
+        {t("auth.newHere")} <Link href="/signup" className="font-bold text-brand-600 hover:underline">{t("auth.createAccount")}</Link>
       </p>
 
       {process.env.NODE_ENV !== "production" && (

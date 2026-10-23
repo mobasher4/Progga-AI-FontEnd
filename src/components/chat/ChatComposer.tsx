@@ -66,12 +66,12 @@ export const ChatComposer = forwardRef<ComposerHandle, Props>(function ChatCompo
             e.preventDefault();
             if (canSend) onSubmit();
           }}
-          className="rounded-[26px] border-2 border-line bg-white shadow-soft transition-colors focus-within:border-grape-300 focus-within:shadow-lift"
+          className="rounded-[26px] border-2 border-line bg-white shadow-soft transition-colors focus-within:border-brand-300 focus-within:shadow-lift"
         >
           {showKeys && (
             <div className="flex flex-wrap gap-1.5 border-b border-line px-3 pb-2 pt-3">
               {SYMBOLS.map((s) => (
-                <button key={s} type="button" onClick={() => insert(s)} className="h-8 min-w-8 rounded-lg border border-line bg-cream px-2 font-display font-bold hover:border-grape-300 hover:bg-grape-50">
+                <button key={s} type="button" onClick={() => insert(s)} className="h-8 min-w-8 rounded-lg border border-line bg-cream px-2 font-display font-bold hover:border-brand-300 hover:bg-brand-50">
                   {s}
                 </button>
               ))}
@@ -101,7 +101,7 @@ export const ChatComposer = forwardRef<ComposerHandle, Props>(function ChatCompo
             <button
               type="button"
               onClick={() => setShowKeys((v) => !v)}
-              className={clsx("grid h-9 w-9 place-items-center rounded-full transition-colors", showKeys ? "bg-grape-100 text-grape-700" : "text-ink-muted hover:bg-cream hover:text-ink")}
+              className={clsx("grid h-9 w-9 place-items-center rounded-full transition-colors", showKeys ? "bg-brand-100 text-brand-700" : "text-ink-muted hover:bg-cream hover:text-ink")}
               title={t("session.symbols")}
               aria-label={t("session.symbols")}
               aria-pressed={showKeys}
@@ -114,7 +114,7 @@ export const ChatComposer = forwardRef<ComposerHandle, Props>(function ChatCompo
               disabled={!canSend}
               className={clsx(
                 "ml-auto grid h-10 w-10 place-items-center rounded-full transition-all md:ml-2",
-                canSend ? "bg-grape-500 text-white shadow-[0_3px_0_0_var(--color-grape-700)] hover:bg-grape-400 active:translate-y-0.5 active:shadow-none" : "bg-line text-ink-muted",
+                canSend ? "bg-brand-500 text-white shadow-[0_3px_0_0_var(--color-brand-700)] hover:bg-brand-400 active:translate-y-0.5 active:shadow-none" : "bg-line text-ink-muted",
               )}
               aria-label={t("session.send")}
             >

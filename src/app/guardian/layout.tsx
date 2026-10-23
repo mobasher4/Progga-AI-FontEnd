@@ -30,7 +30,7 @@ export default function GuardianLayout({ children }: { children: React.ReactNode
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <Link href="/guardian" className="flex items-center gap-3">
             <Logo size={34} />
-            <span className="hidden rounded-full bg-grape-50 px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-grape-600 md:inline">
+            <span className="hidden rounded-full bg-brand-50 px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-brand-600 md:inline">
               {user.role === "TEACHER" ? t("guardian.teacherDashboard") : t("guardian.parentDashboard")}
             </span>
           </Link>

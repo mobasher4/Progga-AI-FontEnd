@@ -49,7 +49,7 @@ export function Modal({
             {dismissable && (
               <button
                 onClick={onClose}
-                className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full text-ink-muted hover:bg-grape-50 hover:text-ink"
+                className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full text-ink-muted hover:bg-brand-50 hover:text-ink"
                 aria-label={t("common.close")}
               >
                 <X size={18} />

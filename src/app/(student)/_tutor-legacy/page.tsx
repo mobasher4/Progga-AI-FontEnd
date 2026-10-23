@@ -102,7 +102,7 @@ function NewQuestion() {
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
-                className="mt-3 rounded-2xl bg-grape-50 px-4 py-2 font-display font-bold text-grape-700"
+                className="mt-3 rounded-2xl bg-brand-50 px-4 py-2 font-display font-bold text-brand-700"
               >
                 {busy ? t(PLANNING_LINES[line]) : blocked ? t("ask.tryElse") : t("ask.ready")}
               </motion.p>
@@ -120,14 +120,14 @@ function NewQuestion() {
                   type="button"
                   key={s.id}
                   onClick={() => setSubject(s.id)}
-                  className={clsx("chip shrink-0", subject === s.id ? "border-grape-500 bg-grape-500 text-white" : "border-line bg-white text-ink-soft hover:border-grape-200")}
+                  className={clsx("chip shrink-0", subject === s.id ? "border-brand-500 bg-brand-500 text-white" : "border-line bg-white text-ink-soft hover:border-brand-200")}
                 >
                   <span>{s.icon}</span> {ui === "bn" ? s.nameBn : s.name}
                 </button>
               ))}
             </div>
 
-            <div className="mt-4 rounded-3xl border-2 border-line bg-white p-2 transition-colors focus-within:border-grape-400 focus-within:ring-4 focus-within:ring-grape-100">
+            <div className="mt-4 rounded-3xl border-2 border-line bg-white p-2 transition-colors focus-within:border-brand-400 focus-within:ring-4 focus-within:ring-brand-100">
               <textarea
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}

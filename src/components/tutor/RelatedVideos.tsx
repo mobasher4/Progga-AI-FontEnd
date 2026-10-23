@@ -36,7 +36,7 @@ export function VideoThumb({ v, size = "sm" }: { v: LessonCard; size?: "sm" | "l
       <span className="absolute inset-0 grid place-items-center">
         <span
           className={clsx(
-            "grid place-items-center rounded-full bg-white/95 text-grape-600 shadow-lift transition-transform group-hover:scale-110",
+            "grid place-items-center rounded-full bg-white/95 text-brand-600 shadow-lift transition-transform group-hover:scale-110",
             lg ? "h-12 w-12" : "h-8 w-8",
           )}
         >
@@ -66,7 +66,7 @@ export function RelatedVideosCard({ videos }: { videos: LessonCard[] }) {
         {videos.map((v) => (
           <Link key={v.id} href={`/lessons/${v.id}`} target="_blank" className="group block rounded-2xl p-1 transition-colors hover:bg-cream">
             <VideoThumb v={v} size="lg" />
-            <span className="mt-2 block px-1 font-display text-sm font-bold leading-snug group-hover:text-grape-600">{v.title}</span>
+            <span className="mt-2 block px-1 font-display text-sm font-bold leading-snug group-hover:text-brand-600">{v.title}</span>
             <span className="block px-1 text-xs font-semibold text-ink-muted">{t("cards.lessonMeta", { n: v.grade, chapter: v.chapter })}</span>
           </Link>
         ))}

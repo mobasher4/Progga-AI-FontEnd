@@ -51,7 +51,7 @@ export default function LessonsPage() {
               onClick={() => setPicked(g)}
               className={clsx(
                 "relative flex shrink-0 flex-col items-center rounded-2xl border-2 px-4 py-2 transition-colors",
-                g === grade ? "border-grape-500 bg-grape-500 text-white shadow-soft" : "border-line bg-white text-ink-soft hover:border-grape-200 hover:text-ink",
+                g === grade ? "border-brand-500 bg-brand-500 text-white shadow-soft" : "border-line bg-white text-ink-soft hover:border-brand-200 hover:text-ink",
               )}
             >
               <span className="text-[10px] font-extrabold uppercase tracking-wider opacity-80">{t("lessons.classLabel")}</span>

@@ -9,7 +9,7 @@ export function SubjectPicker({ subjects, value, onChange, disabled }: { subject
   const { t, ui } = useT();
   const current = subjects.find((s) => s.id === value);
   return (
-    <label className="relative flex h-9 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-cream pl-3 pr-2 text-sm font-bold text-ink-soft hover:border-grape-200 hover:text-ink">
+    <label className="relative flex h-9 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-cream pl-3 pr-2 text-sm font-bold text-ink-soft hover:border-brand-200 hover:text-ink">
       <span>{current?.icon ?? "📚"}</span>
       <span className="max-w-[9rem] truncate">{current ? (ui === "bn" ? current.nameBn : current.name) : t("chatui.subject")}</span>
       <ChevronDown size={14} />

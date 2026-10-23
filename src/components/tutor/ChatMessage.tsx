@@ -17,8 +17,8 @@ const KIND_STYLE: Record<string, Style> = {
   hint: { box: "bg-sky-50 border-2 border-sky-100", label: "chat.hint", labelCls: "text-sky-600" },
   teach: { box: "bg-white border-2 border-sky-200", label: "chat.teach", labelCls: "text-sky-600" },
   why: { box: "bg-mint-50 border-2 border-mint-100", label: "chat.why", labelCls: "text-mint-700" },
-  reveal: { box: "bg-grape-50 border-2 border-grape-100", label: "chat.reveal", labelCls: "text-grape-600" },
-  recap: { box: "bg-white border-2 border-grape-100", label: "chat.recap", labelCls: "text-grape-600" },
+  reveal: { box: "bg-brand-50 border-2 border-brand-100", label: "chat.reveal", labelCls: "text-brand-600" },
+  recap: { box: "bg-white border-2 border-brand-100", label: "chat.recap", labelCls: "text-brand-600" },
   safety: { box: "bg-coral-50 border-2 border-coral-100", label: "chat.safety", labelCls: "text-coral-600" },
 };
 
@@ -41,13 +41,13 @@ function VideoSuggestions({ videos }: { videos: LessonCard[] }) {
             key={v.id}
             href={`/lessons/${v.id}`}
             target="_blank"
-            className="group flex items-center gap-3 rounded-2xl border border-line bg-cream/60 p-2 transition-all hover:-translate-y-0.5 hover:border-grape-200 hover:shadow-soft"
+            className="group flex items-center gap-3 rounded-2xl border border-line bg-cream/60 p-2 transition-all hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-soft"
           >
             <VideoThumb v={v} />
             <span className="min-w-0">
               <span className="line-clamp-2 font-display text-sm font-bold leading-snug">{v.title}</span>
               <span className="mt-0.5 block truncate text-xs font-semibold text-ink-muted">{t("cards.lessonMeta", { n: v.grade, chapter: v.chapter })}</span>
-              <span className="mt-0.5 block text-xs font-extrabold text-grape-500">▶ {t("chat.watch")}</span>
+              <span className="mt-0.5 block text-xs font-extrabold text-brand-500">▶ {t("chat.watch")}</span>
             </span>
           </Link>
         ))}
@@ -66,7 +66,7 @@ function AnswerCard({ m, onExplore }: { m: TutorMessage; onExplore?: (q: string)
 
   return (
     <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.12 } } }} className="space-y-3">
-      <motion.div variants={item} className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-grape-500 to-grape-700 p-5 text-white shadow-lift">
+      <motion.div variants={item} className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 p-5 text-white shadow-lift">
         <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-banana-300/40 blur-2xl" />
         <p className="relative text-xs font-extrabold uppercase tracking-wider text-banana-300">{t("chat.quick")}</p>
         <div className="relative mt-1 font-display text-xl font-bold leading-snug [&_.katex]:text-white [&_strong]:text-banana-300">
@@ -97,11 +97,11 @@ function AnswerCard({ m, onExplore }: { m: TutorMessage; onExplore?: (q: string)
 
       {explore.length > 0 && (
         <motion.div variants={item}>
-          <p className="mb-2 text-xs font-extrabold uppercase tracking-wider text-grape-600">{t("chat.explore")}</p>
+          <p className="mb-2 text-xs font-extrabold uppercase tracking-wider text-brand-600">{t("chat.explore")}</p>
           <div className="flex flex-wrap gap-2">
             {explore.map((q) =>
               onExplore ? (
-                <button key={q} onClick={() => onExplore(q)} className="chip border-grape-100 bg-white text-left text-grape-700 hover:border-grape-300 hover:bg-grape-50">
+                <button key={q} onClick={() => onExplore(q)} className="chip border-brand-100 bg-white text-left text-brand-700 hover:border-brand-300 hover:bg-brand-50">
                   {q} →
                 </button>
               ) : (
@@ -122,7 +122,7 @@ export function ChatMessage({ m, compact = false, onExplore }: { m: TutorMessage
   if (m.role === "student") {
     return (
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex justify-end">
-        <div className="max-w-[85%] rounded-3xl rounded-br-lg bg-grape-500 px-4 py-3 text-white shadow-[0_3px_0_0_var(--color-grape-700)] [&_.katex]:text-white">
+        <div className="max-w-[85%] rounded-3xl rounded-br-lg bg-brand-500 px-4 py-3 text-white shadow-[0_3px_0_0_var(--color-brand-700)] [&_.katex]:text-white">
           <Markdown>{m.content}</Markdown>
         </div>
       </motion.div>
@@ -139,7 +139,7 @@ export function ChatMessage({ m, compact = false, onExplore }: { m: TutorMessage
         initial={{ opacity: 0, scale: 0.92 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-grape-500 to-grape-700 p-5 text-white shadow-lift"
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 p-5 text-white shadow-lift"
       >
         <div className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-banana-300/40 blur-2xl" />
         <p className="relative font-display text-2xl font-extrabold">{m.content}</p>
@@ -152,7 +152,7 @@ export function ChatMessage({ m, compact = false, onExplore }: { m: TutorMessage
           </div>
         )}
         {bigIdea && (
-          <p className="relative mt-3 text-grape-100">
+          <p className="relative mt-3 text-brand-100">
             <b className="text-white">{t("chat.bigIdea")}</b> {bigIdea}
           </p>
         )}
@@ -169,7 +169,7 @@ export function ChatMessage({ m, compact = false, onExplore }: { m: TutorMessage
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex items-end gap-2.5">
       {!compact && (
-        <span className="mb-1 hidden h-9 w-9 shrink-0 place-items-center rounded-xl bg-grape-50 sm:grid">
+        <span className="mb-1 hidden h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50 sm:grid">
           <ProggaMark size={28} />
         </span>
       )}
@@ -186,7 +186,7 @@ export function TypingBubble() {
   const { t } = useT();
   return (
     <div className="flex items-end gap-2.5">
-      <span className="mb-1 hidden h-9 w-9 shrink-0 place-items-center rounded-xl bg-grape-50 sm:grid">
+      <span className="mb-1 hidden h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50 sm:grid">
         <ProggaMark size={28} />
       </span>
       <div className="flex items-center gap-2 rounded-3xl rounded-bl-lg border border-line bg-white px-4 py-3.5">
@@ -194,7 +194,7 @@ export function TypingBubble() {
         {[0, 1, 2].map((i) => (
           <motion.span
             key={i}
-            className="h-2.5 w-2.5 rounded-full bg-grape-400"
+            className="h-2.5 w-2.5 rounded-full bg-brand-400"
             animate={{ y: [0, -6, 0], opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.15 }}
           />

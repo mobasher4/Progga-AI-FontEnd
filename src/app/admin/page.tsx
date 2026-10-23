@@ -38,7 +38,7 @@ const PROVIDER_STYLE: Record<ProviderId, { icon: string; tint: string }> = {
   openai: { icon: "🟢", tint: "from-mint-50 to-white" },
   deepseek: { icon: "🐋", tint: "from-sky-50 to-white" },
   anthropic: { icon: "🟠", tint: "from-banana-50 to-white" },
-  mock: { icon: "🧪", tint: "from-grape-50 to-white" },
+  mock: { icon: "🧪", tint: "from-brand-50 to-white" },
 };
 
 const secs = (ms?: number) => (ms === undefined ? "—" : `${(ms / 1000).toFixed(1)}s`);
@@ -98,7 +98,7 @@ export default function AiSettingsPage() {
       await mutate();
       void globalMutate("/health");
       burst();
-      toast(`Progga now thinks with ${draft.model}`, "🧠", "grape");
+      toast(`Progga now thinks with ${draft.model}`, "🧠", "brand");
     } catch (e) {
       setError(errorMessage(e));
     } finally {
@@ -117,7 +117,7 @@ export default function AiSettingsPage() {
       </div>
 
       {/* Currently active */}
-      <div className="card flex flex-col gap-5 bg-gradient-to-br from-grape-500 to-grape-700 p-6 text-white sm:flex-row sm:items-center">
+      <div className="card flex flex-col gap-5 bg-gradient-to-br from-brand-500 to-brand-700 p-6 text-white sm:flex-row sm:items-center">
         <ProggaBot size={110} mood={botMood} />
         <div className="flex-1">
           <p className="text-xs font-extrabold uppercase tracking-wider text-banana-300">Live right now</p>
@@ -145,7 +145,7 @@ export default function AiSettingsPage() {
                 className={clsx(
                   "card relative bg-gradient-to-br p-4 text-left transition-all",
                   PROVIDER_STYLE[p.id].tint,
-                  selected ? "border-2 border-grape-500 ring-4 ring-grape-100" : "hover:-translate-y-0.5 hover:shadow-lift",
+                  selected ? "border-2 border-brand-500 ring-4 ring-brand-100" : "hover:-translate-y-0.5 hover:shadow-lift",
                   !p.configured && "cursor-not-allowed opacity-55 hover:translate-y-0 hover:shadow-soft",
                 )}
               >

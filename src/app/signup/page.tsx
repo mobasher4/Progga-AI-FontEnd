@@ -67,9 +67,9 @@ function SignupForm() {
           <button
             key={r.id}
             onClick={() => setRole(r.id)}
-            className="card flex w-full items-center gap-4 p-4 text-left transition-all hover:-translate-y-0.5 hover:border-grape-300 hover:shadow-lift"
+            className="card flex w-full items-center gap-4 p-4 text-left transition-all hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-lift"
           >
-            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-grape-50 text-3xl">{r.icon}</span>
+            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-brand-50 text-3xl">{r.icon}</span>
             <span>
               <span className="block font-display text-xl font-extrabold">{t(r.title)}</span>
               <span className="text-sm text-ink-soft">{t(r.text)}</span>
@@ -77,7 +77,7 @@ function SignupForm() {
           </button>
         ))}
         <p className="pt-3 text-center text-ink-soft">
-          {t("auth.haveAccount")} <Link href="/login" className="font-bold text-grape-600 hover:underline">{t("auth.loginButton")}</Link>
+          {t("auth.haveAccount")} <Link href="/login" className="font-bold text-brand-600 hover:underline">{t("auth.loginButton")}</Link>
         </p>
       </div>
     );
@@ -118,7 +118,7 @@ function SignupForm() {
                 onClick={() => set("grade", g)}
                 className={clsx(
                   "rounded-2xl border-2 py-2.5 font-display text-lg font-extrabold transition-all",
-                  form.grade === g ? "border-grape-500 bg-grape-500 text-white shadow-[0_3px_0_0_var(--color-grape-700)]" : "border-line bg-white hover:border-grape-200",
+                  form.grade === g ? "border-brand-500 bg-brand-500 text-white shadow-[0_3px_0_0_var(--color-brand-700)]" : "border-line bg-white hover:border-brand-200",
                 )}
               >
                 {n(g)}
@@ -137,7 +137,7 @@ function SignupForm() {
               type="button"
               key={l.id}
               onClick={() => void setLang(l.id)}
-              className={clsx("rounded-2xl border-2 px-2 py-2.5 text-center transition-all", lang === l.id ? "border-grape-500 bg-grape-50" : "border-line bg-white hover:border-grape-200")}
+              className={clsx("rounded-2xl border-2 px-2 py-2.5 text-center transition-all", lang === l.id ? "border-brand-500 bg-brand-50" : "border-line bg-white hover:border-brand-200")}
             >
               <span className="block font-display font-extrabold">{t(l.label)}</span>
               <span className="text-xs text-ink-muted">{t(l.sub)}</span>

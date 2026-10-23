@@ -76,17 +76,17 @@ export default function ProfilePage() {
         <button onClick={logout} className="btn-ghost btn-sm"><LogOut size={16} /> {t("common.logout")}</button>
       </div>
 
-      <div className="card bg-gradient-to-br from-grape-50 to-white p-6">
+      <div className="card bg-gradient-to-br from-brand-50 to-white p-6">
         <p className="eyebrow">{t("profile.linkEyebrow")}</p>
         <h2 className="mt-1 text-xl font-extrabold">{t("profile.linkTitle")}</h2>
         <p className="mt-1 text-sm text-ink-soft">{t("profile.linkBody")}</p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <span className="rounded-2xl border-2 border-dashed border-grape-300 bg-white px-5 py-3 font-display text-3xl font-extrabold tracking-[0.3em] text-grape-600">{user.linkCode}</span>
+          <span className="rounded-2xl border-2 border-dashed border-brand-300 bg-white px-5 py-3 font-display text-3xl font-extrabold tracking-[0.3em] text-brand-600">{user.linkCode}</span>
           <button
             className="btn-ghost btn-sm"
             onClick={() => {
               void navigator.clipboard?.writeText(user.linkCode ?? "");
-              toast(t("profile.copied"), "📋", "grape");
+              toast(t("profile.copied"), "📋", "brand");
             }}
           >
             <Copy size={15} /> {t("common.copy")}
@@ -108,7 +108,7 @@ export default function ProfilePage() {
                 type="button"
                 key={g}
                 onClick={() => setForm({ ...form, grade: g })}
-                className={clsx("rounded-xl border-2 py-2 font-display font-extrabold", form.grade === g ? "border-grape-500 bg-grape-500 text-white" : "border-line bg-white")}
+                className={clsx("rounded-xl border-2 py-2 font-display font-extrabold", form.grade === g ? "border-brand-500 bg-brand-500 text-white" : "border-line bg-white")}
               >
                 {n(g)}
               </button>
@@ -120,7 +120,7 @@ export default function ProfilePage() {
           {/* Same setting as the top-bar switcher: saved instantly to the account */}
           <div className="flex flex-wrap gap-2">
             {LANG_OPTIONS.map(([id, label]) => (
-              <button type="button" key={id} onClick={() => void setLang(id)} className={clsx("chip", lang === id ? "border-grape-500 bg-grape-500 text-white" : "border-line bg-white")}>
+              <button type="button" key={id} onClick={() => void setLang(id)} className={clsx("chip", lang === id ? "border-brand-500 bg-brand-500 text-white" : "border-line bg-white")}>
                 {t(label)}
               </button>
             ))}

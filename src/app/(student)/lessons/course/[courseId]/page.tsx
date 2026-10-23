@@ -91,12 +91,12 @@ export default function CoursePage({ params }: { params: Promise<{ courseId: str
               <li className="flex items-center gap-2.5"><PlayCircle size={18} className="text-coral-500" /> {t("lessons.insideVideos", { n: stats.topics })}</li>
               <li className="flex items-center gap-2.5"><FileText size={18} className="text-sky-600" /> {t("lessons.insideReadings", { n: stats.topics })}</li>
               <li className="flex items-center gap-2.5"><HelpCircle size={18} className="text-banana-600" /> {t("lessons.insideCheckpoints", { n: stats.checkpoints })}</li>
-              <li className="flex items-center gap-2.5"><Sparkles size={18} className="text-grape-500" /> {t("lessons.insideXp", { n: xpPerTopic })}</li>
+              <li className="flex items-center gap-2.5"><Sparkles size={18} className="text-brand-500" /> {t("lessons.insideXp", { n: xpPerTopic })}</li>
             </ul>
-            <p className="mt-4 rounded-2xl bg-grape-50 p-3 text-xs font-semibold text-grape-700">{t("lessons.howItWorks")}</p>
+            <p className="mt-4 rounded-2xl bg-brand-50 p-3 text-xs font-semibold text-brand-700">{t("lessons.howItWorks")}</p>
           </div>
           <Link href={`/tutor?subject=${course.subject.id}`} className="card flex items-center gap-3 p-4 transition-all hover:-translate-y-0.5 hover:shadow-lift">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-grape-500 text-white"><Sparkles size={20} /></span>
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-500 text-white"><Sparkles size={20} /></span>
             <span>
               <span className="block font-display font-bold">{t("lessons.confused")}</span>
               <span className="text-sm text-ink-soft">{t("lessons.workThrough")}</span>
@@ -141,7 +141,7 @@ export default function CoursePage({ params }: { params: Promise<{ courseId: str
                 <li key={tp.id}>
                   <Link
                     href={`/lessons/${tp.id}`}
-                    className={clsx("group flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors hover:bg-white", tp.id === nextId && "bg-white ring-2 ring-grape-200")}
+                    className={clsx("group flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors hover:bg-white", tp.id === nextId && "bg-white ring-2 ring-brand-200")}
                   >
                     <span
                       className={clsx(

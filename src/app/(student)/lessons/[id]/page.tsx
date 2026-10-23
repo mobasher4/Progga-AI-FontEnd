@@ -91,7 +91,7 @@ function StandaloneLesson({ data, refresh }: { data: LessonResponse; refresh: ()
               <>
                 <p className="font-display text-lg font-extrabold">{t("lessons.finishEarn", { n: lesson.xpReward })}</p>
                 <p className="mt-1 text-sm text-ink-soft">{t("lessons.rule")}</p>
-                <ProgressBar value={Math.min(1, video.watchedPct / WATCH_RATIO)} className="mt-4" color="bg-grape-500" />
+                <ProgressBar value={Math.min(1, video.watchedPct / WATCH_RATIO)} className="mt-4" color="bg-brand-500" />
                 <button onClick={complete} disabled={!canComplete || completing} className="btn-mint mt-4 w-full">
                   {completing ? <Spinner /> : canComplete ? <><CheckCircle2 size={18} /> {t("lessons.complete")}</> : <><Play size={18} /> {t("lessons.keepWatching")}</>}
                 </button>
@@ -117,7 +117,7 @@ function StandaloneLesson({ data, refresh }: { data: LessonResponse; refresh: ()
           </div>
 
           <Link href={`/tutor?subject=${lesson.subject.id}`} className="card flex items-center gap-3 p-4 transition-all hover:-translate-y-0.5 hover:shadow-lift">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-grape-500 text-white"><Sparkles size={20} /></span>
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-500 text-white"><Sparkles size={20} /></span>
             <span>
               <span className="block font-display font-bold">{t("lessons.confused")}</span>
               <span className="text-sm text-ink-soft">{t("lessons.workThrough")}</span>
