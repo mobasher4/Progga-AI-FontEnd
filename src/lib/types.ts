@@ -96,6 +96,8 @@ export interface TutorStep {
   state: StepState;
   hintsShown: number;
   hintsTotal: number;
+  /** answer choices for the current step (empty for other steps) */
+  options: string[];
 }
 
 export type MsgKind = "text" | "question" | "hint" | "teach" | "feedback" | "why" | "celebrate" | "recap" | "reveal" | "safety" | "answer";
@@ -181,7 +183,91 @@ export interface LessonDetail extends LessonCard {
   description: string;
   provider: "youtube" | "mp4";
   videoUrl: string;
+  /** written lesson (Markdown + $maths$); "" for video-only lessons */
+  body: string;
+  readingMin: number;
   checkpoints: Checkpoint[];
+}
+
+export interface LessonResponse {
+  lesson: LessonDetail;
+  progress: { watchedSec: number; completed: boolean; readDone: boolean; canComplete: boolean };
+  /** set when the lesson is a topic of a course */
+  course: TopicContext | null;
+  related: LessonCard[];
+}
+
+// ── Courses (class → subject course → chapter → topic) ──
+export type CourseSubject = Pick<Subject, "id" | "name" | "nameBn" | "icon" | "color">;
+
+export interface CourseCardData {
+  /** null while the subject has no course yet */
+  id: string | null;
+  title: string;
+  titleBn: string;
+  book: string;
+  description: string;
+  subject: CourseSubject;
+  chapters: number;
+  topics: number;
+  videoSec: number;
+  completed: number;
+  comingSoon: boolean;
+}
+
+export interface CatalogResponse {
+  grade: number;
+  gradesWithCourses: number[];
+  courses: CourseCardData[];
+  quickLessons: LessonCard[];
+}
+
+export interface TopicStatus {
+  videoDone: boolean;
+  hasReading: boolean;
+  readDone: boolean;
+  completed: boolean;
+}
+
+export interface CourseTopic extends TopicStatus {
+  id: string;
+  title: string;
+  durationSec: number;
+  readingMin: number;
+  checkpoints: number;
+  xpReward: number;
+}
+
+export interface CourseChapter {
+  id: string;
+  number: number;
+  title: string;
+  titleBn: string;
+  summary: string;
+  topics: CourseTopic[];
+}
+
+export interface CourseInfo {
+  id: string;
+  title: string;
+  titleBn: string;
+  grade: number;
+  subject: CourseSubject;
+}
+
+export interface CourseResponse {
+  course: CourseInfo & { book: string; description: string };
+  chapters: CourseChapter[];
+  stats: { chapters: number; topics: number; completed: number; videoSec: number; readingMin: number; checkpoints: number };
+  next: { id: string; title: string; started: boolean } | null;
+}
+
+export interface TopicContext {
+  course: CourseInfo;
+  chapterId: string;
+  outline: { id: string; number: number; title: string; titleBn: string; topics: ({ id: string; title: string } & TopicStatus)[] }[];
+  prev: { id: string; title: string } | null;
+  next: { id: string; title: string } | null;
 }
 
 // ── Quiz ──

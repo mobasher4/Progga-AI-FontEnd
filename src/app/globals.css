@@ -140,6 +140,20 @@
 .prose-chat .katex { font-size: 1.08em; }
 .prose-chat .katex-display { @apply my-2 overflow-x-auto overflow-y-hidden py-1; }
 
+/* Written course notes: a little roomier than chat, like a good textbook page */
+.prose-lesson { @apply text-[16px] leading-relaxed text-ink; }
+.prose-lesson > * + * { @apply mt-3; }
+.prose-lesson h3 { @apply mt-7 font-display text-xl font-extrabold; }
+.prose-lesson h3:first-child { @apply mt-0; }
+.prose-lesson ul { @apply list-disc space-y-1.5 pl-6; }
+.prose-lesson ol { @apply list-decimal space-y-1.5 pl-6; }
+.prose-lesson li > ul, .prose-lesson li > ol { @apply mt-1.5; }
+.prose-lesson strong { @apply font-extrabold; }
+.prose-lesson blockquote { @apply rounded-2xl border-l-4 border-grape-300 bg-grape-50 px-4 py-3 text-ink-soft; }
+.prose-lesson code { @apply rounded-md bg-grape-50 px-1.5 py-0.5 text-[0.9em] text-grape-700; }
+.prose-lesson .katex { font-size: 1.08em; }
+.prose-lesson .katex-display { @apply my-3 overflow-x-auto overflow-y-hidden py-1; }
+
 /* Subtle dotted canvas used on hero / tutor backgrounds */
 .bg-dots {
   background-image: radial-gradient(rgb(108 76 241 / 0.12) 1.2px, transparent 1.2px);
