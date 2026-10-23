@@ -11,6 +11,7 @@ import { useCelebrate } from "@/components/celebrate/CelebrationProvider";
 import { ChatComposer, type ComposerHandle } from "@/components/chat/ChatComposer";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { useChatLayout } from "@/components/chat/ChatShell";
+import { AnswerOptions } from "@/components/tutor/AnswerOptions";
 import { ChatMessage, TypingBubble } from "@/components/tutor/ChatMessage";
 import { MissionMap } from "@/components/tutor/MissionMap";
 import { RelatedVideosCard, latestVideos } from "@/components/tutor/RelatedVideos";
@@ -120,6 +121,7 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
   const active = session.status === "active";
   const current = session.steps[session.currentStep];
   const hintsLeft = current ? current.hintsTotal - current.hintsShown : 0;
+  const options = current?.options ?? [];
   const doneSteps = session.steps.filter((s) => s.state === "done" || s.state === "revealed").length;
   const palette = user.skin?.palette ?? paletteFor(user.avatarSkin);
 
@@ -140,6 +142,11 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
       setBusy(null);
       setPendingText(null);
     }
+  }
+
+  function pickOption(option: string) {
+    setText(option);
+    composer.current?.focus();
   }
 
   async function send() {
@@ -258,6 +265,13 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
                   <span className="ml-auto rounded-full bg-grape-50 px-3 py-1 text-xs font-extrabold text-grape-600">
                     {t("session.stepOf", { n: Math.min(session.currentStep + 1, session.totalSteps), total: session.totalSteps })}
                   </span>
+                  <AnswerOptions
+                    options={options}
+                    selected={options.find((o) => o === text.trim())}
+                    onPick={pickOption}
+                    disabled={!!busy}
+                    stepKey={session.currentStep}
+                  />
                 </>
               }
             />
