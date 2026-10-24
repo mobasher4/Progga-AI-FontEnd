@@ -1,15 +1,17 @@
 "use client";
 
 import clsx from "clsx";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { Markdown } from "@/components/ui/Markdown";
 import { ProggaMark } from "@/components/brand/Logo";
+import { ProggaBot } from "@/components/brand/ProggaBot";
 import { VideoThumb } from "@/components/tutor/RelatedVideos";
 import { Loader2, Volume2 } from "lucide-react";
 import { SoundBars } from "@/components/chat/VoiceControls";
 import { useT, type TKey } from "@/i18n";
-import type { LessonCard, TutorMessage } from "@/lib/types";
+import type { Reaction } from "@/lib/reactions";
+import type { LessonCard, Palette, TutorMessage } from "@/lib/types";
 
 type Style = { box: string; label?: TKey; labelCls?: string };
 
@@ -42,11 +44,13 @@ function SpeakButton({ voice, light = false }: { voice: MessageVoice; light?: bo
 
 const KIND_STYLE: Record<string, Style> = {
   text: { box: "bg-white border border-line" },
+  concept: { box: "bg-gradient-to-br from-sky-50 to-white border-2 border-sky-200", label: "chat.concept", labelCls: "text-sky-700" },
   question: { box: "bg-banana-50 border-2 border-banana-300", label: "chat.yourTurn", labelCls: "text-banana-700" },
   hint: { box: "bg-sky-50 border-2 border-sky-100", label: "chat.hint", labelCls: "text-sky-600" },
   teach: { box: "bg-white border-2 border-sky-200", label: "chat.teach", labelCls: "text-sky-600" },
   why: { box: "bg-mint-50 border-2 border-mint-100", label: "chat.why", labelCls: "text-mint-700" },
   reveal: { box: "bg-brand-50 border-2 border-brand-100", label: "chat.reveal", labelCls: "text-brand-600" },
+  walkthrough: { box: "bg-white border-2 border-mint-200", label: "chat.walkthrough", labelCls: "text-mint-700" },
   recap: { box: "bg-white border-2 border-brand-100", label: "chat.recap", labelCls: "text-brand-600" },
   safety: { box: "bg-coral-50 border-2 border-coral-100", label: "chat.safety", labelCls: "text-coral-600" },
 };
@@ -239,15 +243,29 @@ export function ChatMessage({
   );
 }
 
-export function TypingBubble() {
+/** Progga working on a reply: its face and what it's saying ("Mm-hmm!", "Hmm…"), then the typing dots. */
+export function TypingBubble({ reaction, palette }: { reaction?: Reaction | null; palette?: Palette }) {
   const { t } = useT();
   return (
     <div className="flex items-end gap-2.5">
-      <span className="mb-1 hidden h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50 sm:grid">
-        <ProggaMark size={28} />
+      <span className="mb-0.5 grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-brand-50">
+        <ProggaBot size={40} mood={reaction?.mood ?? "thinking"} palette={palette} float={false} />
       </span>
-      <div className="flex items-center gap-2 rounded-3xl rounded-bl-lg border border-line bg-white px-4 py-3.5">
+      <div className="flex items-center gap-2 rounded-3xl rounded-bl-lg border border-line bg-white px-4 py-3">
         <span className="sr-only">{t("chat.thinking")}</span>
+        <AnimatePresence mode="wait">
+          {reaction && (
+            <motion.span
+              key={reaction.text}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="mr-1 font-display font-extrabold text-brand-700"
+            >
+              {reaction.text}
+            </motion.span>
+          )}
+        </AnimatePresence>
         {[0, 1, 2].map((i) => (
           <motion.span
             key={i}
@@ -257,6 +275,32 @@ export function TypingBubble() {
           />
         ))}
       </div>
+    </div>
+  );
+}
+
+/** Progga's quick reaction to a reply ("Wow!", "Hmm, not quite…"), floating above the composer for a moment. */
+export function ReactionPop({ reaction, palette }: { reaction: Reaction | null; palette?: Palette }) {
+  return (
+    <div className="pointer-events-none sticky bottom-2 z-10 h-0">
+      <AnimatePresence>
+        {reaction && (
+          <motion.div
+            key={reaction.text + reaction.key}
+            initial={{ opacity: 0, y: 16, scale: 0.85 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 380, damping: 22 }}
+            className="absolute bottom-0 left-0 flex items-end gap-1.5"
+            role="status"
+          >
+            <ProggaBot size={64} mood={reaction.mood} palette={palette} float={false} />
+            <span className="mb-8 rounded-2xl rounded-bl-md border-2 border-brand-200 bg-white px-3.5 py-2 font-display text-lg font-extrabold text-brand-700 shadow-lift">
+              {reaction.text}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

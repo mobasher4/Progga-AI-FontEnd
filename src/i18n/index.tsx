@@ -35,9 +35,9 @@ function lookup(dict: Dict, key: string): string | undefined {
 }
 
 interface Ctx {
-  /** Chosen language: also what Progga's AI replies in ("mix" = Banglish). */
+  /** Chosen language: also what Progga's AI replies in. */
   lang: Language;
-  /** Interface language: Banglish uses the English interface. */
+  /** Interface language (same as lang). */
   ui: "en" | "bn";
   setLang: (l: Language) => Promise<void>;
   t: (key: TKey, vars?: Vars) => string;

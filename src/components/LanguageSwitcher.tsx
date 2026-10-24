@@ -12,7 +12,6 @@ import { useCelebrate } from "./celebrate/CelebrationProvider";
 const OPTIONS: { id: Language; label: TKey; short: TKey; hint: TKey; badge: string; tint: string }[] = [
   { id: "en", label: "lang.en", short: "lang.shortEn", hint: "lang.enHint", badge: "A", tint: "bg-sky-100 text-sky-600" },
   { id: "bn", label: "lang.bn", short: "lang.shortBn", hint: "lang.bnHint", badge: "অ", tint: "bg-mint-100 text-mint-700" },
-  { id: "mix", label: "lang.mix", short: "lang.shortMix", hint: "lang.mixHint", badge: "Aঅ", tint: "bg-banana-100 text-banana-700" },
 ];
 
 /** Top-bar language picker. Changes the interface AND the language Progga's AI replies in. */

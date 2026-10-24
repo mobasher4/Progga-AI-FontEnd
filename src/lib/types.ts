@@ -1,7 +1,7 @@
 // Shapes returned by the Progga API.
 
 export type Role = "STUDENT" | "PARENT" | "TEACHER" | "ADMIN";
-export type Language = "en" | "bn" | "mix";
+export type Language = "en" | "bn";
 
 export interface Palette {
   body: string;
@@ -100,7 +100,20 @@ export interface TutorStep {
   options: string[];
 }
 
-export type MsgKind = "text" | "question" | "hint" | "teach" | "feedback" | "why" | "celebrate" | "recap" | "reveal" | "safety" | "answer";
+export type MsgKind =
+  | "text"
+  | "concept"
+  | "question"
+  | "hint"
+  | "teach"
+  | "feedback"
+  | "why"
+  | "celebrate"
+  | "walkthrough"
+  | "recap"
+  | "reveal"
+  | "safety"
+  | "answer";
 export type TutorMode = "problem" | "concept" | "fact";
 
 export interface TutorMessage {
@@ -134,6 +147,8 @@ export interface TutorSession {
   createdAt: string;
   /** the video lesson this question was asked from */
   lesson?: { id: string; title: string } | null;
+  /** "lesson" = a syllabus topic taught from scratch ("Start a lesson") */
+  kind?: "question" | "lesson";
 }
 
 export interface SessionSummary {
@@ -143,6 +158,7 @@ export interface SessionSummary {
   topic: string;
   status: TutorSession["status"];
   mode: TutorSession["mode"];
+  kind?: TutorSession["kind"];
   currentStep: number;
   totalSteps: number;
   xpEarned: number;

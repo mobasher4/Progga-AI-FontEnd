@@ -1,0 +1,37 @@
+{
+  "ack": {
+    "how": "a short, warm 'I heard you' acknowledgement, friendly and light",
+    "en": ["Mm-hmm!", "Okay!", "Thank you!"],
+    "bn": ["উম-হুম!", "আচ্ছা!", "ধন্যবাদ!"]
+  },
+  "thinking": {
+    "how": "thoughtful and curious, a slow drawn-out 'hmm' like you are really thinking it over",
+    "en": ["Hmmm… let me think.", "Hmmm…"],
+    "bn": ["হুমম… একটু ভাবি।", "হুমম…"]
+  },
+  "correct": {
+    "how": "genuinely amazed and delighted, bright and excited, like a happy cheer",
+    "en": ["Wow!", "Yay! Great job!", "Woohoo!"],
+    "bn": ["বাহ!", "দারুণ!", "ইয়েই!"]
+  },
+  "partial": {
+    "how": "encouraging and upbeat, 'so close!'",
+    "en": ["Ooh, almost!"],
+    "bn": ["উফ, প্রায় হয়ে গেছে!"]
+  },
+  "incorrect": {
+    "how": "gentle and kind, a soft thoughtful 'hmm', never disappointed",
+    "en": ["Hmm, not quite…"],
+    "bn": ["হুম, পুরোপুরি না…"]
+  },
+  "noWorries": {
+    "how": "warm, calm and reassuring",
+    "en": ["No worries!"],
+    "bn": ["কোনো চিন্তা নেই!"]
+  },
+  "solved": {
+    "how": "over-the-moon excited celebration, a big happy cheer",
+    "en": ["Yaaay! You did it!"],
+    "bn": ["ইয়েএ! তুমি পেরেছ!"]
+  }
+}

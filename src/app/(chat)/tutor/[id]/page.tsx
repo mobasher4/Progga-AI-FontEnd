@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Eye, Lightbulb, PanelRightClose, PanelRightOpen, Pause, PlayCircle, Sparkles, X } from "lucide-react";
+import { ArrowLeft, Eye, Lightbulb, PanelRightClose, PanelRightOpen, Pause, PlayCircle, RotateCw, Sparkles, SquarePen, X } from "lucide-react";
 import Link from "next/link";
 import { use, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -13,15 +13,16 @@ import { ChatComposer, type ComposerHandle } from "@/components/chat/ChatCompose
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { useChatLayout } from "@/components/chat/ChatShell";
 import { AnswerOptions } from "@/components/tutor/AnswerOptions";
-import { ChatMessage, TypingBubble, type MessageVoice } from "@/components/tutor/ChatMessage";
+import { ChatMessage, ReactionPop, TypingBubble, type MessageVoice } from "@/components/tutor/ChatMessage";
 import { MissionMap } from "@/components/tutor/MissionMap";
 import { RelatedVideosCard, latestVideos } from "@/components/tutor/RelatedVideos";
-import { PageLoader, ProgressBar } from "@/components/ui/primitives";
+import { PageLoader, ProgressBar, Spinner } from "@/components/ui/primitives";
 import { useT, type TKey } from "@/i18n";
-import { api, errorMessage } from "@/lib/api";
+import { api, ApiError, errorMessage } from "@/lib/api";
 import { paletteFor } from "@/lib/skins";
 import { startTutorSession } from "@/lib/tutor";
 import type { LessonCard, Palette, TutorActionResult, TutorMessage, TutorSession } from "@/lib/types";
+import { pickReaction, reactionKeyFor, type Reaction } from "@/lib/reactions";
 import { useVoice } from "@/lib/voice";
 
 type Busy = null | "reply" | "hint" | "reveal" | "practice";
@@ -38,7 +39,7 @@ function reactionFor(session: TutorSession): MoodLine | null {
   if (verdict === "incorrect") return { mood: "oops", line: "session.oops" };
   if (verdict === "partial") return { mood: "talking", line: "session.partial" };
   if (last?.kind === "hint") return { mood: "talking", line: "session.hint" };
-  if (last?.kind === "teach") return { mood: "talking", line: "session.teach" };
+  if (last?.kind === "teach" || last?.kind === "concept") return { mood: "talking", line: "session.teach" };
   if (last?.kind === "reveal") return { mood: "talking", line: "session.reveal" };
   if (last?.kind === "safety") return { mood: "idle", line: "session.safety" };
   return null;
@@ -77,8 +78,16 @@ function useBotMood(session: TutorSession | undefined, busy: Busy): MoodLine | n
  * - a just-created chat (`?speak=1`) speaks its opening messages;
  * - switching voice on reads Progga's latest turn.
  * Opening an old chat never starts talking by itself.
+ * New replies come with a quick reaction ("Wow!", "Hmm, not quite…"): shown
+ * always, and said out loud before the reply when voice is on.
  */
-function useReadAloud(id: string, session: TutorSession | undefined, voice: ReturnType<typeof useVoice>) {
+function useReadAloud(
+  id: string,
+  session: TutorSession | undefined,
+  voice: ReturnType<typeof useVoice>,
+  lang: "en" | "bn",
+  onReaction: (r: Reaction) => void,
+) {
   const seen = useRef<Set<string> | null>(null);
   const { speak, stop, enabled, toggles } = voice;
   const handledToggles = useRef(toggles);
@@ -91,14 +100,20 @@ function useReadAloud(id: string, session: TutorSession | undefined, voice: Retu
   useEffect(() => {
     if (!session || session.id !== id) return;
     const tutorIds = session.messages.filter((m) => m.role === "tutor").map((m) => m.id);
+    let opening = false;
     if (seen.current === null) {
-      const fresh = new URLSearchParams(window.location.search).has("speak");
-      if (fresh) window.history.replaceState(window.history.state, "", window.location.pathname);
-      seen.current = new Set(fresh ? [] : tutorIds);
+      opening = new URLSearchParams(window.location.search).has("speak");
+      if (opening) window.history.replaceState(window.history.state, "", window.location.pathname);
+      seen.current = new Set(opening ? [] : tutorIds);
     }
     const fresh = tutorIds.filter((mid) => !seen.current!.has(mid));
     fresh.forEach((mid) => seen.current!.add(mid));
-    if (fresh.length && enabled) speak(session.id, fresh);
+    if (!fresh.length) return;
+    const key = opening ? null : reactionKeyFor(session.messages.filter((m) => fresh.includes(m.id)));
+    const reaction = key ? pickReaction(key, lang) : null;
+    if (reaction) onReaction(reaction);
+    if (enabled) speak(session.id, fresh, reaction?.sound);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, session, enabled, speak]);
 
   useEffect(() => {
@@ -123,18 +138,32 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
   const { id } = use(params);
   const router = useRouter();
   const { user, refreshHistory } = useChatLayout();
-  const { t, n } = useT();
+  const { t, n, ui } = useT();
   const { celebrate, toast, burst } = useCelebrate();
-  const { data, mutate } = useSWR<{ session: TutorSession }>(`/tutor/sessions/${id}`);
+  const { data, error, isValidating, mutate } = useSWR<{ session: TutorSession }>(`/tutor/sessions/${id}`);
   const [text, setText] = useState("");
   const [pendingText, setPendingText] = useState<string | null>(null);
   const [busy, setBusy] = useState<Busy>(null);
+  // what Progga says while it works on a reply ("Mm-hmm!" → "Hmm…"), and its quick reaction once the reply is in
+  const [waitLine, setWaitLine] = useState<Reaction | null>(null);
+  const [pop, setPop] = useState<Reaction | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const composer = useRef<ComposerHandle>(null);
 
   const session = data?.session;
   const messageCount = session?.messages.length ?? 0;
+
+  // A missing chat is reported at once; other failures only once the automatic retries (1s, 2s, 4s) are used up.
+  const missing = error instanceof ApiError && error.status >= 400 && error.status < 500;
+  const failed = !!error && !session;
+  const [gaveUp, setGaveUp] = useState(false);
+  useEffect(() => {
+    setGaveUp(false);
+    if (!failed) return;
+    const timer = setTimeout(() => setGaveUp(true), missing ? 0 : 7500);
+    return () => clearTimeout(timer);
+  }, [failed, missing, id]);
 
   useEffect(() => {
     setPanelOpen(window.innerWidth >= WIDE);
@@ -151,7 +180,26 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
   const moodLine = useBotMood(session, busy);
   const videos = useMemo(() => latestVideos(session?.messages ?? []), [session?.messages]);
   const voice = useVoice();
-  useReadAloud(id, session, voice);
+  useReadAloud(id, session, voice, ui, setPop);
+
+  useEffect(() => {
+    if (!pop) return;
+    const timer = setTimeout(() => setPop(null), REACTION_MS);
+    return () => clearTimeout(timer);
+  }, [pop]);
+
+  // "Mm-hmm!" right away, then "Hmm… let me think" for as long as Progga is checking
+  useEffect(() => {
+    if (busy !== "reply") return setWaitLine(null);
+    const ack = pickReaction("ack", ui);
+    const thinking = pickReaction("thinking", ui);
+    setPop(null);
+    setWaitLine(ack);
+    voice.react([ack.sound, thinking.sound]);
+    const timer = setTimeout(() => setWaitLine(thinking), 1100);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busy]);
 
   // Progga just offered videos while helping: make sure the side panel showing them is open.
   const hadVideos = useRef<boolean | null>(null);
@@ -161,6 +209,30 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
     hadVideos.current = videos.length > 0;
   }, [session, videos.length]);
 
+  if (!session && error && gaveUp) {
+    return (
+      <>
+        <ChatHeader title={t("nav.ask")} />
+        <div className="grid flex-1 place-items-center overflow-y-auto px-4 py-10">
+          <div className="max-w-md text-center">
+            <ProggaBot size={120} mood="oops" palette={user.skin?.palette ?? paletteFor(user.avatarSkin)} />
+            <h1 className="mt-3 text-2xl font-extrabold">{t(missing ? "session.notFound" : "session.loadError")}</h1>
+            <p className="mt-2 text-ink-soft">{t(missing ? "session.notFoundText" : "session.loadErrorText")}</p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              {!missing && (
+                <button className="btn-primary" onClick={() => void mutate()} disabled={isValidating}>
+                  {isValidating ? <Spinner /> : <RotateCw size={18} />} {t("chatui.retry")}
+                </button>
+              )}
+              <button className={missing ? "btn-primary" : "btn-ghost"} onClick={() => router.push(`/tutor?new=${Date.now()}`)}>
+                <SquarePen size={18} /> {t("session.newQuestion")}
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
   if (!session || !moodLine) return <PageLoader label={t("session.opening")} />;
 
   const isFact = session.mode === "fact";
@@ -245,7 +317,7 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
 
   const subtitle = (
     <>
-      {session.topic} · {t(MODE_LABEL[session.mode])}
+      {session.topic} · {t(session.kind === "lesson" ? "session.modeLesson" : MODE_LABEL[session.mode])}
       {!isFact && (
         <>
           {" · "}
@@ -304,10 +376,13 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
               {pendingText && (
                 <>
                   <ChatMessage m={{ id: "pending", role: "student", kind: "text", content: pendingText, stepIndex: null, meta: {}, createdAt: "" }} />
-                  <TypingBubble />
+                  <TypingBubble reaction={waitLine} palette={palette} />
                 </>
               )}
-              {(busy === "hint" || busy === "reveal") && <TypingBubble />}
+              {(busy === "hint" || busy === "reveal") && <TypingBubble palette={palette} />}
+            </div>
+            <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
+              <ReactionPop reaction={pop} palette={palette} />
             </div>
           </div>
 

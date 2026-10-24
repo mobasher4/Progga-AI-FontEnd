@@ -2,15 +2,16 @@
 
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
-import { Home, PanelLeftClose, PlayCircle, Search, SquarePen, Swords, Trophy, X } from "lucide-react";
+import { BookOpen, Home, PanelLeftClose, PlayCircle, RotateCw, Search, SquarePen, Swords, Trash2, Trophy, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { Logo } from "@/components/brand/Logo";
 import { ProggaBot } from "@/components/brand/ProggaBot";
 import { PageLoader } from "@/components/ui/primitives";
 import { useSyncAccountLanguage, useT, type TKey } from "@/i18n";
+import { api, ApiError, errorMessage } from "@/lib/api";
 import { homeFor } from "@/lib/routes";
 import { paletteFor } from "@/lib/skins";
 import type { SessionSummary, User } from "@/lib/types";
@@ -40,7 +41,7 @@ const COLLAPSE_KEY = "progga_history_collapsed";
 
 /** Full-screen chat layout for Ask Progga: history on the left, conversation filling the rest. */
 export function ChatShell({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useMe();
+  const { user, isLoading, error, mutate: reloadMe } = useMe();
   const router = useRouter();
   const pathname = usePathname();
   const { t } = useT();
@@ -78,6 +79,21 @@ export function ChatShell({ children }: { children: React.ReactNode }) {
     [user, collapsed, setCollapsed, mutate],
   );
 
+  // couldn't reach the server (a 401 already redirects to login): offer a retry instead of spinning forever
+  if (!user && error && !isLoading && !(error instanceof ApiError && error.status === 401)) {
+    return (
+      <div className="grid h-dvh place-items-center bg-cream px-4 text-center">
+        <div>
+          <ProggaBot size={110} mood="oops" />
+          <p className="mt-3 font-display text-xl font-extrabold">{t("session.loadError")}</p>
+          <p className="mt-1 text-ink-soft">{t("session.loadErrorText")}</p>
+          <button className="btn-primary mt-5" onClick={() => void reloadMe()}>
+            <RotateCw size={18} /> {t("chatui.retry")}
+          </button>
+        </div>
+      </div>
+    );
+  }
   if (isLoading || !user || user.role !== "STUDENT" || !value) return <PageLoader label={t("common.wakingUp")} />;
 
   return (
@@ -150,13 +166,90 @@ const QUICK_LINKS: { href: string; label: TKey; icon: typeof Home }[] = [
   { href: "/rewards", label: "nav.rewards", icon: Trophy },
 ];
 
+const sessionIcon = (s: SessionSummary) => (s.kind === "lesson" ? "📘" : s.mode === "fact" ? "⚡" : s.mode === "concept" ? "🔭" : "🧩");
+
+/** One chat in the history list, with a delete button (asks first, inline). */
+function HistoryItem({ s, active }: { s: SessionSummary; active: boolean }) {
+  const { t } = useT();
+  const router = useRouter();
+  const { toast } = useCelebrate();
+  const { mutate } = useSWRConfig();
+  const [confirming, setConfirming] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function remove() {
+    setDeleting(true);
+    try {
+      await api(`/tutor/sessions/${s.id}`, { method: "DELETE" });
+      await mutate<{ sessions: SessionSummary[] }>(
+        "/tutor/sessions",
+        (cur) => cur && { sessions: cur.sessions.filter((x) => x.id !== s.id) },
+        { revalidate: false },
+      );
+      void mutate(`/tutor/sessions/${s.id}`, undefined, { revalidate: false });
+      if (active) router.push(`/tutor?new=${Date.now()}`);
+      toast(t("chatui.deleted"), "🗑️", "brand");
+    } catch (e) {
+      toast(errorMessage(e), "⚠️", "coral");
+      setDeleting(false);
+      setConfirming(false);
+    }
+  }
+
+  if (confirming) {
+    return (
+      <li className="flex items-center gap-2 rounded-xl bg-coral-50 px-3 py-2 ring-1 ring-coral-100">
+        <span className="min-w-0 flex-1 truncate text-sm font-bold text-coral-600">{t("chatui.deleteConfirm")}</span>
+        <button onClick={remove} disabled={deleting} className="rounded-lg bg-coral-500 px-2.5 py-1 text-xs font-extrabold text-white hover:bg-coral-600 disabled:opacity-60">
+          {deleting ? "…" : t("chatui.delete")}
+        </button>
+        <button onClick={() => setConfirming(false)} disabled={deleting} className="rounded-lg px-2 py-1 text-xs font-bold text-ink-soft hover:bg-white">
+          {t("chatui.cancel")}
+        </button>
+      </li>
+    );
+  }
+
+  return (
+    <li className="group relative">
+      <Link
+        href={`/tutor/${s.id}`}
+        className={clsx(
+          "flex items-center gap-2.5 rounded-xl py-2 pl-3 pr-9 transition-colors",
+          active ? "bg-white shadow-soft ring-1 ring-brand-100" : "hover:bg-white/70",
+        )}
+      >
+        <span className="text-base">{sessionIcon(s)}</span>
+        <span className="min-w-0 flex-1">
+          <span className={clsx("block truncate text-sm font-bold", active ? "text-brand-700" : "text-ink")}>{s.title}</span>
+          <span className="block truncate text-xs text-ink-muted">{s.topic || s.subject}</span>
+        </span>
+        <span
+          className={clsx(
+            "h-2 w-2 shrink-0 rounded-full transition-opacity group-hover:opacity-0",
+            s.mode === "fact" ? "bg-sky-400" : s.status === "solved" ? "bg-mint-500" : s.status === "active" ? "bg-banana-400" : "bg-line",
+          )}
+        />
+      </Link>
+      <button
+        onClick={() => setConfirming(true)}
+        className="absolute right-1.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-lg text-ink-muted opacity-100 transition-opacity hover:bg-coral-50 hover:text-coral-600 focus:opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+        aria-label={t("chatui.deleteChat", { title: s.title })}
+        title={t("chatui.delete")}
+      >
+        <Trash2 size={15} />
+      </button>
+    </li>
+  );
+}
+
 function HistoryPanel({ onClose, closeIcon }: { onClose: () => void; closeIcon: "collapse" | "close" }) {
   const { user } = useChatLayout();
   const { t, tx, n } = useT();
   const pathname = usePathname();
   const router = useRouter();
   const [query, setQuery] = useState("");
-  const { data } = useSWR<{ sessions: SessionSummary[] }>("/tutor/sessions");
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ sessions: SessionSummary[] }>("/tutor/sessions");
 
   const filtered = useMemo(() => {
     const all = data?.sessions ?? [];
@@ -183,9 +276,18 @@ function HistoryPanel({ onClose, closeIcon }: { onClose: () => void; closeIcon: 
       </div>
 
       <div className="space-y-2.5 px-3 pb-3">
-        <button onClick={() => router.push(`/tutor?new=${Date.now()}`)} className="btn-primary w-full justify-start !rounded-2xl !py-2.5">
-          <SquarePen size={18} /> {t("chatui.newChat")}
-        </button>
+        <div className="grid grid-cols-[1fr_auto] gap-2">
+          <button onClick={() => router.push(`/tutor?new=${Date.now()}`)} className="btn-primary justify-start !rounded-2xl !py-2.5">
+            <SquarePen size={18} /> {t("chatui.newChat")}
+          </button>
+          <Link
+            href="/tutor/learn"
+            className={clsx("btn-ghost !rounded-2xl !px-3 !py-2.5", pathname === "/tutor/learn" && "!border-brand-300 !bg-brand-50")}
+            title={t("learn.title")}
+          >
+            <BookOpen size={18} className="text-brand-600" /> <span className="text-sm">{t("learn.short")}</span>
+          </Link>
+        </div>
         <label className="relative block">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted" />
           <input
@@ -198,39 +300,31 @@ function HistoryPanel({ onClose, closeIcon }: { onClose: () => void; closeIcon: 
       </div>
 
       <nav className="min-h-0 flex-1 space-y-4 overflow-y-auto px-2 pb-3">
-        {groups.length === 0 && (
+        {!data && isLoading && (
+          <div className="space-y-2 px-1 pt-1" aria-hidden="true">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-11 animate-pulse rounded-xl bg-white/70" />
+            ))}
+          </div>
+        )}
+        {!data && error && !isLoading && (
+          <div className="px-3 py-6 text-center">
+            <p className="text-sm text-ink-muted">{t("chatui.historyError")}</p>
+            <button onClick={() => void mutate()} disabled={isValidating} className="btn-ghost btn-sm mt-3">
+              <RotateCw size={15} className={clsx(isValidating && "animate-spin")} /> {t("chatui.retry")}
+            </button>
+          </div>
+        )}
+        {data && groups.length === 0 && (
           <p className="px-3 py-6 text-center text-sm text-ink-muted">{query ? t("chatui.noMatches") : t("chatui.empty")}</p>
         )}
         {groups.map((g) => (
           <div key={g.key}>
             <p className="px-3 pb-1 text-[11px] font-extrabold uppercase tracking-wider text-ink-muted">{t(g.key)}</p>
             <ul className="space-y-0.5">
-              {g.items.map((s) => {
-                const active = pathname === `/tutor/${s.id}`;
-                return (
-                  <li key={s.id}>
-                    <Link
-                      href={`/tutor/${s.id}`}
-                      className={clsx(
-                        "group flex items-center gap-2.5 rounded-xl px-3 py-2 transition-colors",
-                        active ? "bg-white shadow-soft ring-1 ring-brand-100" : "hover:bg-white/70",
-                      )}
-                    >
-                      <span className="text-base">{s.mode === "fact" ? "⚡" : s.mode === "concept" ? "🔭" : "🧩"}</span>
-                      <span className="min-w-0 flex-1">
-                        <span className={clsx("block truncate text-sm font-bold", active ? "text-brand-700" : "text-ink")}>{s.title}</span>
-                        <span className="block truncate text-xs text-ink-muted">{s.topic || s.subject}</span>
-                      </span>
-                      <span
-                        className={clsx(
-                          "h-2 w-2 shrink-0 rounded-full",
-                          s.mode === "fact" ? "bg-sky-400" : s.status === "solved" ? "bg-mint-500" : s.status === "active" ? "bg-banana-400" : "bg-line",
-                        )}
-                      />
-                    </Link>
-                  </li>
-                );
-              })}
+              {g.items.map((s) => (
+                <HistoryItem key={s.id} s={s} active={pathname === `/tutor/${s.id}`} />
+              ))}
             </ul>
           </div>
         ))}

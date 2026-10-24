@@ -23,7 +23,6 @@ const ROLES: { id: Exclude<Role, "ADMIN">; icon: string; title: TKey; text: TKey
 const LANGS: { id: Language; label: TKey; sub: TKey }[] = [
   { id: "en", label: "lang.en", sub: "auth.langEnSub" },
   { id: "bn", label: "lang.bn", sub: "auth.langBnSub" },
-  { id: "mix", label: "lang.mix", sub: "auth.langMixSub" },
 ];
 
 function SignupForm() {
@@ -131,7 +130,7 @@ function SignupForm() {
 
       <div>
         <span className="label">{t("auth.talkIn")}</span>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {LANGS.map((l) => (
             <button
               type="button"

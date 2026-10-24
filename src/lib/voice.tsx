@@ -13,6 +13,10 @@ export type VoiceRate = (typeof VOICE_RATES)[number];
 const ENABLED_KEY = "progga_voice";
 const RATE_KEY = "progga_voice_rate";
 
+// The TTS clips come out quiet (speech around -27 dBFS, peaks near -10), so
+// they are boosted ~10 dB and run through a limiter that stops loud bits clipping.
+const BOOST = 3.2;
+
 interface VoiceCtx {
   /** the backend can speak (OpenAI key configured) */
   available: boolean;
@@ -26,10 +30,15 @@ interface VoiceCtx {
   /** message currently being spoken, or loading to be spoken */
   speakingId: string | null;
   loadingId: string | null;
-  /** read these messages one after another (replaces anything queued) */
-  speak: (sessionId: string, messageIds: string[]) => void;
+  /** read these messages one after another (replaces anything queued), optionally after a short reaction sound */
+  speak: (sessionId: string, messageIds: string[], lead?: string) => void;
+  /** play short reaction sounds ("Mm-hmm!", "Hmm…") in order, if voice is on */
+  react: (urls: string[]) => void;
   stop: () => void;
 }
+
+/** One clip to play: a message's speech (id set) or a reaction sound (id null). */
+type Clip = { id: string | null; url: string };
 
 const Ctx = createContext<VoiceCtx | null>(null);
 
@@ -61,7 +70,8 @@ export function VoiceProvider({ children, onError }: { children: React.ReactNode
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
   const audio = useRef<HTMLAudioElement | null>(null);
-  const queue = useRef<{ sessionId: string; id: string }[]>([]);
+  const graph = useRef<AudioContext | null>(null);
+  const queue = useRef<Clip[]>([]);
   const blobs = useRef(new Map<string, Promise<string | null>>());
   const rateRef = useRef<VoiceRate>(1);
   const generation = useRef(0); // bumps on stop/replace so stale callbacks do nothing
@@ -74,16 +84,34 @@ export function VoiceProvider({ children, onError }: { children: React.ReactNode
   }, []);
 
   const player = useCallback(() => {
-    if (!audio.current) audio.current = new Audio();
+    if (!audio.current) {
+      const el = new Audio();
+      audio.current = el;
+      try {
+        const ctx = new AudioContext();
+        const gain = ctx.createGain();
+        gain.gain.value = BOOST;
+        const limiter = ctx.createDynamicsCompressor();
+        limiter.threshold.value = -6;
+        limiter.knee.value = 4;
+        limiter.ratio.value = 12;
+        limiter.attack.value = 0.003;
+        limiter.release.value = 0.2;
+        ctx.createMediaElementSource(el).connect(gain).connect(limiter).connect(ctx.destination);
+        graph.current = ctx;
+      } catch {
+        /* no Web Audio: plays at the clip's own volume */
+      }
+    }
     return audio.current;
   }, []);
 
   /** Downloads a clip in the background (used for everything after the first in the queue). */
-  const prefetch = useCallback((sessionId: string, id: string) => {
-    if (blobs.current.has(id)) return;
+  const prefetch = useCallback((url: string) => {
+    if (blobs.current.has(url)) return;
     blobs.current.set(
-      id,
-      fetch(speechUrl(sessionId, id), { credentials: "include" })
+      url,
+      fetch(url, { credentials: "include" })
         .then((r) => (r.ok ? r.blob() : null))
         .then((b) => (b ? URL.createObjectURL(b) : null))
         .catch(() => null),
@@ -98,15 +126,15 @@ export function VoiceProvider({ children, onError }: { children: React.ReactNode
       setLoadingId(null);
       return;
     }
-    queue.current.forEach((q) => prefetch(q.sessionId, q.id));
+    queue.current.forEach((q) => prefetch(q.url));
 
     const el = player();
     setSpeakingId(null);
     setLoadingId(next.id);
-    const cached = blobs.current.has(next.id) ? await blobs.current.get(next.id) : null;
+    const cached = blobs.current.has(next.url) ? await blobs.current.get(next.url) : null;
     if (gen !== generation.current) return;
-    el.src = cached ?? speechUrl(next.sessionId, next.id);
-    el.playbackRate = rateRef.current;
+    el.src = cached ?? next.url;
+    el.playbackRate = next.id ? rateRef.current : 1; // reactions always at natural speed
     el.onplaying = () => gen === generation.current && (setSpeakingId(next.id), setLoadingId(null));
     el.onended = () => gen === generation.current && void playNext();
     el.onerror = () => {
@@ -115,6 +143,8 @@ export function VoiceProvider({ children, onError }: { children: React.ReactNode
       void playNext();
     };
     try {
+      // browsers start the boost graph suspended until the page has been interacted with
+      if (graph.current?.state === "suspended") await graph.current.resume();
       await el.play();
     } catch {
       // autoplay blocked or aborted: stop quietly, the student can press play
@@ -140,13 +170,23 @@ export function VoiceProvider({ children, onError }: { children: React.ReactNode
   }, []);
 
   const speak = useCallback(
-    (sessionId: string, messageIds: string[]) => {
+    (sessionId: string, messageIds: string[], lead?: string) => {
       if (!available || !messageIds.length) return;
       stop();
-      queue.current = messageIds.map((id) => ({ sessionId, id }));
+      queue.current = [...(lead ? [{ id: null, url: lead }] : []), ...messageIds.map((id) => ({ id, url: speechUrl(sessionId, id) }))];
       void playNext();
     },
     [available, stop, playNext],
+  );
+
+  const react = useCallback(
+    (urls: string[]) => {
+      if (!available || !enabled || !urls.length) return;
+      stop();
+      queue.current = urls.map((url) => ({ id: null, url }));
+      void playNext();
+    },
+    [available, enabled, stop, playNext],
   );
 
   const setEnabled = useCallback(
@@ -171,14 +211,17 @@ export function VoiceProvider({ children, onError }: { children: React.ReactNode
     () => () => {
       generation.current++;
       audio.current?.pause();
+      void graph.current?.close().catch(() => undefined);
+      audio.current = null; // an element wired to a closed graph would stay silent
+      graph.current = null;
       blobs.current.forEach((p) => p.then((u) => u && URL.revokeObjectURL(u)));
     },
     [],
   );
 
   const value = useMemo<VoiceCtx>(
-    () => ({ available, enabled: available && enabled, setEnabled, toggles, rate, setRate, speakingId, loadingId, speak, stop }),
-    [available, enabled, setEnabled, toggles, rate, setRate, speakingId, loadingId, speak, stop],
+    () => ({ available, enabled: available && enabled, setEnabled, toggles, rate, setRate, speakingId, loadingId, speak, react, stop }),
+    [available, enabled, setEnabled, toggles, rate, setRate, speakingId, loadingId, speak, react, stop],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

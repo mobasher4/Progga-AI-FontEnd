@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { ProggaBot } from "@/components/brand/ProggaBot";
+import { AppDownload } from "@/components/landing/AppDownload";
 import { HeroScene } from "@/components/landing/HeroScene";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useT, type TKey } from "@/i18n";
@@ -33,6 +34,7 @@ export default function Landing() {
       <Levels />
       <Safety />
       <ParentsCta />
+      <AppDownload />
       <Footer />
     </div>
   );

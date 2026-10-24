@@ -16,7 +16,6 @@ import { useLogout, useMe } from "@/lib/useMe";
 const LANG_OPTIONS: [Language, TKey][] = [
   ["en", "lang.en"],
   ["bn", "lang.bn"],
-  ["mix", "lang.mix"],
 ];
 
 export default function ProfilePage() {

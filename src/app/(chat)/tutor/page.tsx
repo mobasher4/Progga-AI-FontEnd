@@ -1,7 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, BookOpen } from "lucide-react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
@@ -121,6 +122,20 @@ function NewChat() {
                 </div>
               ))}
             </div>
+
+            <Link
+              href="/tutor/learn"
+              className="group mt-3 flex w-full items-center gap-3 rounded-2xl border-2 border-brand-200 bg-gradient-to-r from-brand-50 to-white p-3.5 text-left transition-all hover:-translate-y-0.5 hover:border-brand-300"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-500 text-white">
+                <BookOpen size={20} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-display font-extrabold">{t("learn.askCard")}</span>
+                <span className="block text-sm text-ink-soft">{t("learn.askCardText")}</span>
+              </span>
+              <ArrowUpRight size={18} className="shrink-0 text-brand-500 transition-transform group-hover:translate-x-0.5" />
+            </Link>
 
             <p className="mb-2 mt-7 self-start text-xs font-extrabold uppercase tracking-wider text-ink-muted">{t("chatui.suggestions")}</p>
             <div className="grid w-full gap-2.5 sm:grid-cols-2">
