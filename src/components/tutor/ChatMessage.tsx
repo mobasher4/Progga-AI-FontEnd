@@ -6,10 +6,39 @@ import Link from "next/link";
 import { Markdown } from "@/components/ui/Markdown";
 import { ProggaMark } from "@/components/brand/Logo";
 import { VideoThumb } from "@/components/tutor/RelatedVideos";
+import { Loader2, Volume2 } from "lucide-react";
+import { SoundBars } from "@/components/chat/VoiceControls";
 import { useT, type TKey } from "@/i18n";
 import type { LessonCard, TutorMessage } from "@/lib/types";
 
 type Style = { box: string; label?: TKey; labelCls?: string };
+
+/** Read-aloud state for one message, provided by the chat page when voice is available. */
+export interface MessageVoice {
+  speaking: boolean;
+  loading: boolean;
+  onToggle: () => void;
+}
+
+function SpeakButton({ voice, light = false }: { voice: MessageVoice; light?: boolean }) {
+  const { t } = useT();
+  const active = voice.speaking || voice.loading;
+  return (
+    <button
+      type="button"
+      onClick={voice.onToggle}
+      aria-label={active ? t("voice.stop") : t("voice.listen")}
+      title={active ? t("voice.stop") : t("voice.listen")}
+      className={clsx(
+        "inline-flex h-7 shrink-0 items-center gap-1 rounded-full px-2 text-xs font-extrabold transition-colors",
+        light ? "bg-white/15 text-white hover:bg-white/25" : active ? "bg-brand-100 text-brand-700" : "bg-white/70 text-ink-muted hover:bg-white hover:text-brand-600",
+      )}
+    >
+      {voice.loading ? <Loader2 size={13} className="animate-spin" /> : voice.speaking ? <SoundBars /> : <Volume2 size={14} />}
+      <span className="hidden sm:inline">{active ? t("voice.stop") : t("voice.listen")}</span>
+    </button>
+  );
+}
 
 const KIND_STYLE: Record<string, Style> = {
   text: { box: "bg-white border border-line" },
@@ -57,7 +86,7 @@ function VideoSuggestions({ videos }: { videos: LessonCard[] }) {
 }
 
 /** Quick answer for factual questions: the answer first, then more to know. */
-function AnswerCard({ m, onExplore }: { m: TutorMessage; onExplore?: (q: string) => void }) {
+function AnswerCard({ m, onExplore, voice }: { m: TutorMessage; onExplore?: (q: string) => void; voice?: MessageVoice }) {
   const { t, n } = useT();
   const moreInfo = (m.meta.moreInfo as string[] | undefined) ?? [];
   const funFact = m.meta.funFact as string | undefined;
@@ -68,7 +97,10 @@ function AnswerCard({ m, onExplore }: { m: TutorMessage; onExplore?: (q: string)
     <motion.div initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.12 } } }} className="space-y-3">
       <motion.div variants={item} className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 p-5 text-white shadow-lift">
         <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-banana-300/40 blur-2xl" />
-        <p className="relative text-xs font-extrabold uppercase tracking-wider text-banana-300">{t("chat.quick")}</p>
+        <div className="relative flex items-center justify-between gap-2">
+          <p className="text-xs font-extrabold uppercase tracking-wider text-banana-300">{t("chat.quick")}</p>
+          {voice && <SpeakButton voice={voice} light />}
+        </div>
         <div className="relative mt-1 font-display text-xl font-bold leading-snug [&_.katex]:text-white [&_strong]:text-banana-300">
           <Markdown>{m.content}</Markdown>
         </div>
@@ -115,9 +147,20 @@ function AnswerCard({ m, onExplore }: { m: TutorMessage; onExplore?: (q: string)
   );
 }
 
-export function ChatMessage({ m, compact = false, onExplore }: { m: TutorMessage; compact?: boolean; onExplore?: (q: string) => void }) {
+export function ChatMessage({
+  m,
+  compact = false,
+  onExplore,
+  voice,
+}: {
+  m: TutorMessage;
+  compact?: boolean;
+  onExplore?: (q: string) => void;
+  /** read-aloud controls (Ask Progga only) */
+  voice?: MessageVoice;
+}) {
   const { t } = useT();
-  if (m.kind === "answer") return <AnswerCard m={m} onExplore={onExplore} />;
+  if (m.kind === "answer") return <AnswerCard m={m} onExplore={onExplore} voice={voice} />;
 
   if (m.role === "student") {
     return (
@@ -142,7 +185,10 @@ export function ChatMessage({ m, compact = false, onExplore }: { m: TutorMessage
         className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 p-5 text-white shadow-lift"
       >
         <div className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-banana-300/40 blur-2xl" />
-        <p className="relative font-display text-2xl font-extrabold">{m.content}</p>
+        <div className="relative flex items-start justify-between gap-3">
+          <p className="font-display text-2xl font-extrabold">{m.content}</p>
+          {voice && <SpeakButton voice={voice} light />}
+        </div>
         {finalAnswer && (
           <div className="relative mt-3 inline-block rounded-2xl bg-white/15 px-4 py-2">
             <span className="text-xs font-extrabold uppercase tracking-wider text-banana-300">{t("chat.yourAnswer")}</span>
@@ -173,8 +219,19 @@ export function ChatMessage({ m, compact = false, onExplore }: { m: TutorMessage
           <ProggaMark size={28} />
         </span>
       )}
-      <div className={clsx("max-w-[88%] rounded-3xl rounded-bl-lg px-4 py-3 text-ink", style.box)}>
-        {label && <p className={clsx("mb-1 text-xs font-extrabold uppercase tracking-wider", style.labelCls)}>{label}</p>}
+      <div
+        className={clsx(
+          "max-w-[88%] rounded-3xl rounded-bl-lg px-4 py-3 text-ink transition-shadow",
+          style.box,
+          voice?.speaking && "shadow-[0_0_0_3px_var(--color-brand-200)]",
+        )}
+      >
+        {(label || voice) && (
+          <div className="mb-1 flex items-center justify-between gap-3">
+            {label ? <p className={clsx("text-xs font-extrabold uppercase tracking-wider", style.labelCls)}>{label}</p> : <span />}
+            {voice && <SpeakButton voice={voice} />}
+          </div>
+        )}
         <Markdown>{m.content}</Markdown>
         {Array.isArray(m.meta.videos) && m.meta.videos.length > 0 && <VideoSuggestions videos={m.meta.videos as LessonCard[]} />}
       </div>

@@ -2,7 +2,8 @@
 
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
-import { Eye, Lightbulb, PanelRightClose, PanelRightOpen, Pause, Sparkles, X } from "lucide-react";
+import { ArrowLeft, Eye, Lightbulb, PanelRightClose, PanelRightOpen, Pause, PlayCircle, Sparkles, X } from "lucide-react";
+import Link from "next/link";
 import { use, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
@@ -12,7 +13,7 @@ import { ChatComposer, type ComposerHandle } from "@/components/chat/ChatCompose
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { useChatLayout } from "@/components/chat/ChatShell";
 import { AnswerOptions } from "@/components/tutor/AnswerOptions";
-import { ChatMessage, TypingBubble } from "@/components/tutor/ChatMessage";
+import { ChatMessage, TypingBubble, type MessageVoice } from "@/components/tutor/ChatMessage";
 import { MissionMap } from "@/components/tutor/MissionMap";
 import { RelatedVideosCard, latestVideos } from "@/components/tutor/RelatedVideos";
 import { PageLoader, ProgressBar } from "@/components/ui/primitives";
@@ -20,7 +21,8 @@ import { useT, type TKey } from "@/i18n";
 import { api, errorMessage } from "@/lib/api";
 import { paletteFor } from "@/lib/skins";
 import { startTutorSession } from "@/lib/tutor";
-import type { LessonCard, Palette, TutorActionResult, TutorSession } from "@/lib/types";
+import type { LessonCard, Palette, TutorActionResult, TutorMessage, TutorSession } from "@/lib/types";
+import { useVoice } from "@/lib/voice";
 
 type Busy = null | "reply" | "hint" | "reveal" | "practice";
 type MoodLine = { mood: BotMood; line: TKey };
@@ -69,6 +71,48 @@ function useBotMood(session: TutorSession | undefined, busy: Busy): MoodLine | n
   return waitingOnStudent ? { mood: "asking", line: "session.asking" } : reaction ?? { mood: "idle", line: "session.idle" };
 }
 
+/**
+ * Read-aloud behaviour for a chat:
+ * - new Progga messages are spoken as they arrive (if voice is on);
+ * - a just-created chat (`?speak=1`) speaks its opening messages;
+ * - switching voice on reads Progga's latest turn.
+ * Opening an old chat never starts talking by itself.
+ */
+function useReadAloud(id: string, session: TutorSession | undefined, voice: ReturnType<typeof useVoice>) {
+  const seen = useRef<Set<string> | null>(null);
+  const { speak, stop, enabled, toggles } = voice;
+  const handledToggles = useRef(toggles);
+
+  useEffect(() => {
+    seen.current = null;
+    return () => stop();
+  }, [id, stop]);
+
+  useEffect(() => {
+    if (!session || session.id !== id) return;
+    const tutorIds = session.messages.filter((m) => m.role === "tutor").map((m) => m.id);
+    if (seen.current === null) {
+      const fresh = new URLSearchParams(window.location.search).has("speak");
+      if (fresh) window.history.replaceState(window.history.state, "", window.location.pathname);
+      seen.current = new Set(fresh ? [] : tutorIds);
+    }
+    const fresh = tutorIds.filter((mid) => !seen.current!.has(mid));
+    fresh.forEach((mid) => seen.current!.add(mid));
+    if (fresh.length && enabled) speak(session.id, fresh);
+  }, [id, session, enabled, speak]);
+
+  useEffect(() => {
+    // only when the student clicks the switch on in this chat (not when the saved setting loads)
+    if (toggles === handledToggles.current) return;
+    handledToggles.current = toggles;
+    if (!enabled || !session) return;
+    const lastStudent = session.messages.map((m) => m.role).lastIndexOf("student");
+    const latest = session.messages.slice(lastStudent + 1).filter((m) => m.role === "tutor").map((m) => m.id);
+    if (latest.length) speak(session.id, latest);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toggles]);
+}
+
 const MODE_LABEL: Record<TutorSession["mode"], TKey> = {
   problem: "session.modeProblem",
   concept: "session.modeConcept",
@@ -106,6 +150,8 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
   );
   const moodLine = useBotMood(session, busy);
   const videos = useMemo(() => latestVideos(session?.messages ?? []), [session?.messages]);
+  const voice = useVoice();
+  useReadAloud(id, session, voice);
 
   // Progga just offered videos while helping: make sure the side panel showing them is open.
   const hadVideos = useRef<boolean | null>(null);
@@ -124,6 +170,18 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
   const options = current?.options ?? [];
   const doneSteps = session.steps.filter((s) => s.state === "done" || s.state === "revealed").length;
   const palette = user.skin?.palette ?? paletteFor(user.avatarSkin);
+  // Progga moves its mouth while its voice is playing
+  const speakingHere = !!voice.speakingId && session.messages.some((m) => m.id === voice.speakingId);
+  const mood: BotMood = speakingHere && moodLine.mood !== "cheer" ? "talking" : moodLine.mood;
+
+  const voiceFor = (m: TutorMessage): MessageVoice | undefined =>
+    voice.available && m.role === "tutor"
+      ? {
+          speaking: voice.speakingId === m.id,
+          loading: voice.loadingId === m.id,
+          onToggle: () => (voice.speakingId === m.id || voice.loadingId === m.id ? voice.stop() : voice.speak(session.id, [m.id])),
+        }
+      : undefined;
 
   async function act(kind: "reply" | "hint" | "reveal", body?: unknown) {
     setBusy(kind);
@@ -166,11 +224,12 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
     setPendingText(question.trim());
     setText("");
     try {
-      const res = await startTutorSession(question.trim(), session!.subject);
+      // follow-ups from a lesson question stay tied to that lesson
+      const res = await startTutorSession(question.trim(), session!.subject, null, session!.lesson?.id);
       if (res.blocked) throw new Error(res.message);
       await mutate(); // keep this chat's cache fresh for when the student comes back
       refreshHistory();
-      router.push(`/tutor/${res.session.id}`);
+      router.push(`/tutor/${res.session.id}?speak=1`);
     } catch (e) {
       toast(errorMessage(e), "⚠️", "coral");
       setBusy(null);
@@ -230,7 +289,18 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
         <div className="flex min-w-0 flex-1 flex-col">
           <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
             <div className="mx-auto w-full max-w-3xl space-y-3 px-4 py-6 sm:px-6">
-              {session.messages.map((m) => <ChatMessage key={m.id} m={m} onExplore={startNew} />)}
+              {session.lesson && (
+                <Link
+                  href={`/lessons/${session.lesson.id}`}
+                  className="mx-auto flex w-fit max-w-full items-center gap-2 rounded-full border border-line bg-white px-3.5 py-1.5 text-sm shadow-soft transition-colors hover:border-brand-200 hover:bg-brand-50"
+                >
+                  <PlayCircle size={16} className="shrink-0 text-coral-500" />
+                  <span className="shrink-0 font-bold text-ink-muted">{t("lessonAsk.fromLesson")}</span>
+                  <span className="truncate font-extrabold">{session.lesson.title}</span>
+                  <ArrowLeft size={15} className="shrink-0 text-brand-500" aria-label={t("lessonAsk.backToLesson")} />
+                </Link>
+              )}
+              {session.messages.map((m) => <ChatMessage key={m.id} m={m} onExplore={startNew} voice={voiceFor(m)} />)}
               {pendingText && (
                 <>
                   <ChatMessage m={{ id: "pending", role: "student", kind: "text", content: pendingText, stepIndex: null, meta: {}, createdAt: "" }} />
@@ -318,7 +388,7 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
               >
                 <ProgressPanel
                   session={session}
-                  mood={moodLine.mood}
+                  mood={mood}
                   line={t(moodLine.line)}
                   palette={palette}
                   onClose={() => setPanelOpen(false)}

@@ -1,12 +1,13 @@
 "use client";
 
 import clsx from "clsx";
-import { ArrowLeft, CheckCircle2, Clock, Play, Sparkles, Trophy } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clock, Play, Trophy } from "lucide-react";
 import Link from "next/link";
 import { use, useState } from "react";
 import useSWR from "swr";
 import { useCelebrate } from "@/components/celebrate/CelebrationProvider";
 import { LessonTile } from "@/components/cards";
+import { AskProggaCard } from "@/components/lessons/AskProggaCard";
 import { CourseTopic } from "@/components/lessons/CourseTopic";
 import { CheckpointModal, CheckpointTimeline, WATCH_RATIO, useLessonVideo } from "@/components/lessons/useLessonVideo";
 import { VideoPlayer } from "@/components/lessons/VideoPlayer";
@@ -116,13 +117,7 @@ function StandaloneLesson({ data, refresh }: { data: LessonResponse; refresh: ()
             </ul>
           </div>
 
-          <Link href={`/tutor?subject=${lesson.subject.id}`} className="card flex items-center gap-3 p-4 transition-all hover:-translate-y-0.5 hover:shadow-lift">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-500 text-white"><Sparkles size={20} /></span>
-            <span>
-              <span className="block font-display font-bold">{t("lessons.confused")}</span>
-              <span className="text-sm text-ink-soft">{t("lessons.workThrough")}</span>
-            </span>
-          </Link>
+          <AskProggaCard lesson={{ id: lesson.id, title: lesson.title, subjectId: lesson.subject.id }} done={progress.completed} compact />
         </aside>
       </div>
 

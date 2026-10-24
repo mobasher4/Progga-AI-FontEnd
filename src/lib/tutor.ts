@@ -1,11 +1,12 @@
 import { api } from "./api";
 import type { StartResult } from "./types";
 
-export function startTutorSession(question: string, subject: string, image?: File | null) {
+export function startTutorSession(question: string, subject: string, image?: File | null, lessonId?: string) {
   const form = new FormData();
   form.set("question", question);
   form.set("subject", subject);
   if (image) form.set("image", image);
+  if (lessonId) form.set("lessonId", lessonId);
   return api<StartResult>("/tutor/sessions", { form });
 }
 

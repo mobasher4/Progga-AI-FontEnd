@@ -1,10 +1,11 @@
 "use client";
 
 import clsx from "clsx";
-import { ArrowLeft, ArrowRight, Check, ChevronDown, FileText, ListTree, PlayCircle, Sparkles, Trophy } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronDown, FileText, ListTree, PlayCircle, Trophy } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useCelebrate } from "@/components/celebrate/CelebrationProvider";
+import { AskProggaCard } from "@/components/lessons/AskProggaCard";
 import { useBilingual } from "@/components/lessons/CourseCard";
 import { CheckpointModal, CheckpointTimeline, useLessonVideo } from "@/components/lessons/useLessonVideo";
 import { VideoPlayer } from "@/components/lessons/VideoPlayer";
@@ -122,6 +123,8 @@ export function CourseTopic({ data, refresh }: { data: LessonResponse & { course
             </section>
           )}
 
+          <AskProggaCard lesson={{ id: lesson.id, title: lesson.title, subjectId: ctx.course.subject.id }} done={completed} />
+
           <nav className="flex flex-col gap-3 sm:flex-row sm:justify-between">
             {ctx.prev ? (
               <Link href={`/lessons/${ctx.prev.id}`} className="card flex min-w-0 items-center gap-3 p-4 transition-all hover:-translate-y-0.5 hover:shadow-lift sm:max-w-[48%]">
@@ -144,14 +147,6 @@ export function CourseTopic({ data, refresh }: { data: LessonResponse & { course
               <p className="card p-4 font-display font-extrabold text-mint-700">{t("lessons.courseEnd")}</p>
             )}
           </nav>
-
-          <Link href={`/tutor?subject=${ctx.course.subject.id}`} className="card flex items-center gap-3 p-4 transition-all hover:-translate-y-0.5 hover:shadow-lift">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand-500 text-white"><Sparkles size={20} /></span>
-            <span>
-              <span className="block font-display font-bold">{t("lessons.askAbout")}</span>
-              <span className="text-sm text-ink-soft">{t("lessons.workThrough")}</span>
-            </span>
-          </Link>
         </div>
       </div>
 

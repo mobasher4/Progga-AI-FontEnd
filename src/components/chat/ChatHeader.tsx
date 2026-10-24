@@ -4,6 +4,7 @@ import { Menu, PanelLeftOpen } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useT } from "@/i18n";
 import { useChatLayout } from "./ChatShell";
+import { VoiceControls } from "./VoiceControls";
 
 /** Slim top bar of the chat: history toggle, title, language, page-specific actions. */
 export function ChatHeader({ title, subtitle, actions }: { title: React.ReactNode; subtitle?: React.ReactNode; actions?: React.ReactNode }) {
@@ -31,6 +32,7 @@ export function ChatHeader({ title, subtitle, actions }: { title: React.ReactNod
       </div>
       <div className="flex shrink-0 items-center gap-1.5">
         {actions}
+        <VoiceControls />
         <LanguageSwitcher compact />
       </div>
     </header>

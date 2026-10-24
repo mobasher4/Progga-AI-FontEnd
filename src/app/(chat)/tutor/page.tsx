@@ -84,7 +84,7 @@ function NewChat() {
       }
       await mutate(`/tutor/sessions/${res.session.id}`, { session: res.session }, { revalidate: false });
       refreshHistory();
-      router.push(`/tutor/${res.session.id}`);
+      router.push(`/tutor/${res.session.id}?speak=1`);
     } catch (err) {
       setError(errorMessage(err));
       setQuestion(q);

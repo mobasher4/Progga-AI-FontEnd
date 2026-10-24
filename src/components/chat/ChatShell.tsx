@@ -15,6 +15,8 @@ import { homeFor } from "@/lib/routes";
 import { paletteFor } from "@/lib/skins";
 import type { SessionSummary, User } from "@/lib/types";
 import { useMe } from "@/lib/useMe";
+import { VoiceProvider } from "@/lib/voice";
+import { useCelebrate } from "@/components/celebrate/CelebrationProvider";
 
 interface ChatLayout {
   user: User;
@@ -42,6 +44,7 @@ export function ChatShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { t } = useT();
+  const { toast } = useCelebrate();
   const [collapsed, setCollapsedState] = useState(false);
   const [drawer, setDrawer] = useState(false);
   const { mutate } = useSWR<{ sessions: SessionSummary[] }>(user ? "/tutor/sessions" : null);
@@ -79,6 +82,7 @@ export function ChatShell({ children }: { children: React.ReactNode }) {
 
   return (
     <ChatLayoutCtx.Provider value={value}>
+      <VoiceProvider onError={() => toast(t("voice.error"), "🔇", "coral")}>
       <div className="flex h-dvh overflow-hidden bg-white">
         {/* Desktop history column */}
         <aside
@@ -112,6 +116,7 @@ export function ChatShell({ children }: { children: React.ReactNode }) {
 
         <div className="flex min-w-0 flex-1 flex-col">{children}</div>
       </div>
+      </VoiceProvider>
     </ChatLayoutCtx.Provider>
   );
 }

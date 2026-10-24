@@ -132,6 +132,8 @@ export interface TutorSession {
   steps: TutorStep[];
   messages: TutorMessage[];
   createdAt: string;
+  /** the video lesson this question was asked from */
+  lesson?: { id: string; title: string } | null;
 }
 
 export interface SessionSummary {
