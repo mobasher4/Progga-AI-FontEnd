@@ -221,8 +221,7 @@ function Levels() {
   const bands = [
     { range: "landing.band1Range", name: "landing.band1Name", text: "landing.band1Text", color: "from-banana-300 to-banana-500", mood: "happy" as const },
     { range: "landing.band2Range", name: "landing.band2Name", text: "landing.band2Text", color: "from-mint-400 to-mint-600", mood: "talking" as const },
-    { range: "landing.band3Range", name: "landing.band3Name", text: "landing.band3Text", color: "from-sky-400 to-sky-600", mood: "thinking" as const },
-    { range: "landing.band4Range", name: "landing.band4Name", text: "landing.band4Text", color: "from-brand-400 to-brand-700", mood: "idle" as const },
+    { range: "landing.band3Range", name: "landing.band3Name", text: "landing.band3Text", color: "from-brand-400 to-brand-700", mood: "thinking" as const },
   ] satisfies { range: TKey; name: TKey; text: TKey; color: string; mood: string }[];
   return (
     <section className="bg-white py-20">
@@ -232,7 +231,7 @@ function Levels() {
           <h2 className="mt-2 text-4xl font-extrabold sm:text-5xl">{t("landing.levelsTitle")}</h2>
           <p className="mt-4 text-lg text-ink-soft">{t("landing.levelsBody")}</p>
         </div>
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-5 sm:grid-cols-3">
           {bands.map((b) => (
             <div key={b.name} className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${b.color} p-6 text-white`}>
               <p className="text-sm font-extrabold uppercase tracking-wider opacity-80">{t(b.range)}</p>

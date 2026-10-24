@@ -102,7 +102,7 @@ export default function ProfilePage() {
         </div>
         <div>
           <span className="label">{t("profile.class")}</span>
-          <div className="grid grid-cols-5 gap-2 sm:grid-cols-10">
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
             {GRADES.map((g) => (
               <button
                 type="button"

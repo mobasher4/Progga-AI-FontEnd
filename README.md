@@ -1,6 +1,6 @@
 # Progga AI — Frontend 🍌🤖
 
-Next.js app for **Progga AI**, the AI tutor that helps kids *think*, not copy. For students from Class 3 to HSC, with parents, teachers and admins.
+Next.js app for **Progga AI**, the AI tutor that helps kids *think*, not copy. For students from Class 3 to SSC, with parents, teachers and admins.
 
 Backend: [Progga-AI-Backend](https://github.com/mobasher4/Progga-AI-Backend)
 

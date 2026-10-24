@@ -110,7 +110,7 @@ function SignupForm() {
       {role === "STUDENT" && (
         <div>
           <span className="label">{t("auth.yourClass")}</span>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-4 gap-2">
             {GRADES.map((g) => (
               <button
                 type="button"

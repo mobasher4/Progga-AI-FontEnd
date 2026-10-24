@@ -15,7 +15,7 @@ const hind = Hind_Siliguri({ subsets: ["bengali", "latin"], weight: ["400", "500
 export const metadata: Metadata = {
   title: { default: "Progga AI — the tutor that helps kids think", template: "%s · Progga AI" },
   description:
-    "Progga is a safe AI tutor for students from Class 3 to HSC. Instead of handing out answers, it guides students step by step with questions, hints and the 'why' behind every move.",
+    "Progga is a safe AI tutor for students from Class 3 to SSC. Instead of handing out answers, it guides students step by step with questions, hints and the 'why' behind every move.",
 };
 
 export const viewport: Viewport = { themeColor: "#2B7BE8" };
