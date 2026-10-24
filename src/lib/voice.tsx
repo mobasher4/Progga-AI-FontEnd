@@ -17,6 +17,11 @@ const RATE_KEY = "progga_voice_rate";
 // they are boosted ~10 dB and run through a limiter that stops loud bits clipping.
 const BOOST = 3.2;
 
+// Progga is a kid: clips play slightly faster with pitch preservation off, which
+// raises both pitch and the voice's "size" (formants) like a child's. The voice is
+// asked to speak slowly (backend VOICE_STYLE), so the pace still sounds natural.
+const KID_LIFT = 1.12;
+
 interface VoiceCtx {
   /** the backend can speak (OpenAI key configured) */
   available: boolean;
@@ -134,7 +139,8 @@ export function VoiceProvider({ children, onError }: { children: React.ReactNode
     const cached = blobs.current.has(next.url) ? await blobs.current.get(next.url) : null;
     if (gen !== generation.current) return;
     el.src = cached ?? next.url;
-    el.playbackRate = next.id ? rateRef.current : 1; // reactions always at natural speed
+    el.preservesPitch = false;
+    el.playbackRate = (next.id ? rateRef.current : 1) * KID_LIFT; // reactions ignore the speed setting
     el.onplaying = () => gen === generation.current && (setSpeakingId(next.id), setLoadingId(null));
     el.onended = () => gen === generation.current && void playNext();
     el.onerror = () => {
@@ -203,7 +209,7 @@ export function VoiceProvider({ children, onError }: { children: React.ReactNode
     setRateState(r);
     rateRef.current = r;
     writeStore(RATE_KEY, String(r));
-    if (audio.current) audio.current.playbackRate = r;
+    if (audio.current) audio.current.playbackRate = r * KID_LIFT;
   }, []);
 
   // stop talking when leaving Ask Progga; free downloaded clips

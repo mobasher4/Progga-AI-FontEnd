@@ -15,7 +15,7 @@ const out = join(root, "public/sounds/reactions");
 const key = process.env.OPENAI_API_KEY;
 const base = process.env.OPENAI_BASE_URL ?? "https://api.openai.com/v1";
 const model = process.env.OPENAI_TTS_MODEL ?? "gpt-4o-mini-tts";
-const voice = process.env.OPENAI_TTS_VOICE ?? "coral";
+const voice = process.env.OPENAI_TTS_VOICE ?? "coral"; // keep in step with the backend's read-aloud voice
 const force = process.argv.includes("--force");
 
 if (!key) {
@@ -24,8 +24,9 @@ if (!key) {
 }
 
 const persona =
-  "You are Progga, a cheerful, kind robot tutor for school children in Bangladesh. This is a tiny spoken reaction, not a sentence to read: " +
-  "make it sound natural and expressive, at full speaking volume with a bright, well-projected voice.";
+  "Identity: a 10-year-old child: Progga, the cheerful robot buddy of a school student in Bangladesh. You ARE a kid, not an adult doing a voice. " +
+  "Pitch: high and light, like a young child. Unhurried (the app plays it a little faster). This is a tiny spoken reaction, not a sentence to read: " +
+  "make it sound natural and expressive, at full volume and well projected.";
 
 for (const [name, entry] of Object.entries(lines)) {
   for (const lang of ["en", "bn"]) {
