@@ -165,6 +165,13 @@ export interface SessionSummary {
   updatedAt: string;
 }
 
+/** Part of Progga's next message, streamed while the AI is still writing it (replaced by the saved messages). */
+export interface PreviewMessage {
+  kind: MsgKind;
+  content: string;
+  meta?: Record<string, unknown>;
+}
+
 export interface TutorActionResult {
   session: TutorSession;
   newMessages: TutorMessage[];

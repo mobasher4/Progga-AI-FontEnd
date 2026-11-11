@@ -1,14 +1,29 @@
-import { api } from "./api";
-import type { StartResult } from "./types";
+import { api, apiStream } from "./api";
+import type { PreviewMessage, StartResult, TutorMessage } from "./types";
+import { storedEngine } from "./useEngine";
 
-export function startTutorSession(question: string, subject: string, image?: File | null, lessonId?: string) {
+/** `onPreview`: show Progga's opening word by word while it's being written. */
+export function startTutorSession(question: string, subject: string, image?: File | null, lessonId?: string, onPreview?: (p: PreviewMessage[]) => void) {
   const form = new FormData();
   form.set("question", question);
   form.set("subject", subject);
   if (image) form.set("image", image);
   if (lessonId) form.set("lessonId", lessonId);
-  return api<StartResult>("/tutor/sessions", { form });
+  const engine = storedEngine();
+  if (engine) form.set("engine", engine);
+  return onPreview ? apiStream<StartResult, PreviewMessage[]>("/tutor/sessions", { form }, onPreview) : api<StartResult>("/tutor/sessions", { form });
 }
+
+/** A streamed preview, shaped like a chat message so it renders exactly like the real one. */
+export const previewAsMessage = (p: PreviewMessage, i: number): TutorMessage => ({
+  id: `preview-${i}`,
+  role: "tutor",
+  kind: p.kind,
+  content: p.content,
+  stepIndex: null,
+  meta: p.meta ?? {},
+  createdAt: "",
+});
 
 export const EXAMPLES_BN: Record<string, string[]> = {
   math: ["3x + 5 = 20 সমাধান করো", "47 + 38 কত?", "ত্রিভুজের ক্ষেত্রফল কীভাবে বের করব?"],

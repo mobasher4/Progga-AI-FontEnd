@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { Bot, Crown, Home, LogOut, PlayCircle, Swords, Trophy, UserRound } from "lucide-react";
+import { Bot, Crown, Home, LogOut, PlayCircle, Swords, Trophy, UserRound, Zap } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -15,16 +15,17 @@ import { paletteFor } from "@/lib/skins";
 import { useLogout, useMe } from "@/lib/useMe";
 import type { User } from "@/lib/types";
 
-const NAV: { href: string; label: TKey; icon: typeof Home }[] = [
+const NAV: { href: string; label: TKey; short?: TKey; icon: typeof Home; hot?: boolean }[] = [
   { href: "/home", label: "nav.home", icon: Home },
   { href: "/tutor", label: "nav.ask", icon: Bot },
   { href: "/lessons", label: "nav.lessons", icon: PlayCircle },
-  { href: "/arena", label: "nav.arena", icon: Swords },
+  { href: "/arena", label: "nav.arena", icon: Zap },
+  { href: "/battle", label: "nav.battle", short: "nav.battleShort", icon: Swords, hot: true },
   { href: "/rewards", label: "nav.rewards", icon: Trophy },
   { href: "/leaderboard", label: "nav.leaderboard", icon: Crown },
   { href: "/profile", label: "nav.profile", icon: UserRound },
 ];
-const MOBILE_NAV = NAV.filter((n) => ["/home", "/tutor", "/lessons", "/arena", "/rewards"].includes(n.href));
+const MOBILE_NAV = NAV.filter((n) => ["/home", "/tutor", "/lessons", "/arena", "/battle", "/rewards"].includes(n.href));
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useMe();
@@ -50,7 +51,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Logo size={38} />
         </Link>
         <nav className="mt-8 flex flex-1 flex-col gap-1">
-          {NAV.map(({ href, label, icon: Icon }) => (
+          {NAV.map(({ href, label, icon: Icon, hot }) => (
             <Link
               key={href}
               href={href}
@@ -62,12 +63,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span
                 className={clsx(
                   "grid h-9 w-9 shrink-0 place-items-center rounded-xl transition-colors",
-                  active(href) ? "bg-brand-500 text-white shadow-[0_3px_0_0_var(--color-brand-700)]" : "bg-cream text-ink-soft group-hover:bg-white",
+                  active(href)
+                    ? "bg-brand-500 text-white shadow-[0_3px_0_0_var(--color-brand-700)]"
+                    : hot
+                      ? "bg-gradient-to-b from-orange-400 to-rose-500 text-white shadow-[0_3px_0_0_#9f1239]"
+                      : "bg-cream text-ink-soft group-hover:bg-white",
                 )}
               >
                 <Icon size={19} strokeWidth={2.4} />
               </span>
               <span className="truncate">{t(label)}</span>
+              {hot && !active(href) && <span className="ml-auto h-2 w-2 shrink-0 animate-pulse rounded-full bg-rose-500" />}
             </Link>
           ))}
         </nav>
@@ -93,12 +99,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Mobile tab bar */}
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-md justify-between">
-          {MOBILE_NAV.map(({ href, label, icon: Icon }) => (
+          {MOBILE_NAV.map(({ href, label, short, icon: Icon }) => (
             <Link key={href} href={href} className={clsx("flex min-w-0 flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-bold", active(href) ? "text-brand-600" : "text-ink-muted")}>
               <span className={clsx("grid h-8 w-12 place-items-center rounded-full transition-colors", active(href) && "bg-brand-100")}>
                 <Icon size={20} strokeWidth={2.4} />
               </span>
-              <span className="max-w-full truncate px-0.5">{t(label)}</span>
+              <span className="max-w-full truncate px-0.5">{t(short ?? label)}</span>
             </Link>
           ))}
         </div>

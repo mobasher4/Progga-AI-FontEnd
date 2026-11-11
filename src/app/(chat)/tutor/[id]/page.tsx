@@ -18,10 +18,12 @@ import { MissionMap } from "@/components/tutor/MissionMap";
 import { RelatedVideosCard, latestVideos } from "@/components/tutor/RelatedVideos";
 import { PageLoader, ProgressBar, Spinner } from "@/components/ui/primitives";
 import { useT, type TKey } from "@/i18n";
-import { api, ApiError, errorMessage } from "@/lib/api";
+import { api, ApiError, apiStream, errorMessage } from "@/lib/api";
 import { paletteFor } from "@/lib/skins";
-import { startTutorSession } from "@/lib/tutor";
-import type { LessonCard, Palette, TutorActionResult, TutorMessage, TutorSession } from "@/lib/types";
+import { previewAsMessage, startTutorSession } from "@/lib/tutor";
+import { storedEngine } from "@/lib/useEngine";
+import { EnginePicker } from "@/components/chat/ComposerTools";
+import type { LessonCard, Palette, PreviewMessage, TutorActionResult, TutorMessage, TutorSession } from "@/lib/types";
 import { pickReaction, reactionKeyFor, type Reaction } from "@/lib/reactions";
 import { useVoice } from "@/lib/voice";
 
@@ -144,6 +146,8 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
   const [text, setText] = useState("");
   const [pendingText, setPendingText] = useState<string | null>(null);
   const [busy, setBusy] = useState<Busy>(null);
+  // Progga's answer, word by word, while the AI is still writing it
+  const [preview, setPreview] = useState<PreviewMessage[]>([]);
   // what Progga says while it works on a reply ("Mm-hmm!" → "Hmm…"), and its quick reaction once the reply is in
   const [waitLine, setWaitLine] = useState<Reaction | null>(null);
   const [pop, setPop] = useState<Reaction | null>(null);
@@ -171,7 +175,7 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messageCount, pendingText, busy]);
+  }, [messageCount, pendingText, busy, preview]);
 
   const practice = useMemo(
     () => session?.messages.find((m) => typeof m.meta.practice === "string")?.meta.practice as string | undefined,
@@ -259,7 +263,10 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
     setBusy(kind);
     try {
       const path = kind === "reply" ? "reply" : kind === "hint" ? "hint" : "reveal-step";
-      const res = await api<TutorActionResult>(`/tutor/sessions/${id}/${path}`, { method: "POST", body });
+      const res =
+        kind === "reply"
+          ? await apiStream<TutorActionResult, PreviewMessage[]>(`/tutor/sessions/${id}/${path}`, { method: "POST", body }, setPreview)
+          : await api<TutorActionResult>(`/tutor/sessions/${id}/${path}`, { method: "POST", body });
       await mutate({ session: res.session }, { revalidate: false });
       celebrate(res.rewards, { confetti: res.session.status === "solved" });
       if (res.session.status === "solved" && !res.rewards) burst();
@@ -271,21 +278,19 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
     } finally {
       setBusy(null);
       setPendingText(null);
+      setPreview([]);
     }
   }
 
-  function pickOption(option: string) {
-    setText(option);
-    composer.current?.focus();
-  }
-
-  async function send() {
-    const msg = text.trim();
+  /** A tapped answer choice is sent right away: no typing, no Enter. */
+  async function send(answer?: string) {
+    const msg = (answer ?? text).trim();
     if (!msg || busy) return;
+    const typed = text;
     setPendingText(msg);
     setText("");
-    const ok = await act("reply", { message: msg });
-    if (!ok) setText(msg);
+    const ok = await act("reply", { message: msg, engine: storedEngine() });
+    if (!ok) setText(answer === undefined ? msg : typed);
     composer.current?.focus();
   }
 
@@ -297,7 +302,7 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
     setText("");
     try {
       // follow-ups from a lesson question stay tied to that lesson
-      const res = await startTutorSession(question.trim(), session!.subject, null, session!.lesson?.id);
+      const res = await startTutorSession(question.trim(), session!.subject, null, session!.lesson?.id, setPreview);
       if (res.blocked) throw new Error(res.message);
       await mutate(); // keep this chat's cache fresh for when the student comes back
       refreshHistory();
@@ -306,6 +311,7 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
       toast(errorMessage(e), "⚠️", "coral");
       setBusy(null);
       setPendingText(null);
+      setPreview([]);
     }
   }
 
@@ -376,7 +382,11 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
               {pendingText && (
                 <>
                   <ChatMessage m={{ id: "pending", role: "student", kind: "text", content: pendingText, stepIndex: null, meta: {}, createdAt: "" }} />
-                  <TypingBubble reaction={waitLine} palette={palette} />
+                  {preview.length ? (
+                    preview.map((p, i) => <ChatMessage key={`preview-${i}`} m={previewAsMessage(p, i)} streaming={i === preview.length - 1} />)
+                  ) : (
+                    <TypingBubble reaction={waitLine} palette={palette} />
+                  )}
                 </>
               )}
               {(busy === "hint" || busy === "reveal") && <TypingBubble palette={palette} />}
@@ -397,6 +407,7 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
               busy={busy === "reply"}
               disabled={!!busy}
               autoFocus
+              tools={<EnginePicker disabled={!!busy} />}
               above={
                 <>
                   <ActionChip onClick={() => act("hint")} disabled={!!busy || hintsLeft <= 0} icon={<Lightbulb size={15} className="text-banana-600" />}>
@@ -413,7 +424,7 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
                   <AnswerOptions
                     options={options}
                     selected={options.find((o) => o === text.trim())}
-                    onPick={pickOption}
+                    onPick={(option) => void send(option)}
                     disabled={!!busy}
                     stepKey={session.currentStep}
                   />
@@ -430,6 +441,7 @@ export default function TutorSessionPage({ params }: { params: Promise<{ id: str
               label={t("session.followLabel")}
               busy={busy === "practice"}
               disabled={!!busy}
+              tools={<EnginePicker disabled={!!busy} />}
               above={
                 practice && session.status === "solved" ? (
                   <ActionChip onClick={() => startNew(practice)} disabled={!!busy} icon={<Sparkles size={15} className="text-banana-600" />} highlight>

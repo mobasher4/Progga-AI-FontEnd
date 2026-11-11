@@ -1,8 +1,9 @@
 "use client";
 
-import { ChevronDown, ImagePlus, X } from "lucide-react";
+import { ChevronDown, Cpu, ImagePlus, X } from "lucide-react";
 import { useT } from "@/i18n";
 import type { Subject } from "@/lib/types";
+import { useEngineChoice } from "@/lib/useEngine";
 
 /** Compact subject chip with a native select underneath (great on phones). */
 export function SubjectPicker({ subjects, value, onChange, disabled }: { subjects: Subject[]; value: string; onChange: (id: string) => void; disabled?: boolean }) {
@@ -23,6 +24,37 @@ export function SubjectPicker({ subjects, value, onChange, disabled }: { subject
         {subjects.map((s) => (
           <option key={s.id} value={s.id}>
             {s.icon} {ui === "bn" ? s.nameBn : s.name}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+/** Which AI model answers: shown when there is more than one to pick from. */
+export function EnginePicker({ disabled }: { disabled?: boolean }) {
+  const { t } = useT();
+  const { engines, current, choose } = useEngineChoice();
+  if (engines.length < 2 || !current) return null;
+  return (
+    <label
+      className="relative flex h-9 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-cream pl-3 pr-2 text-sm font-bold text-ink-soft hover:border-brand-200 hover:text-ink"
+      title={t("chatui.model")}
+    >
+      <Cpu size={15} className="shrink-0" />
+      <span className="max-w-[8rem] truncate">{current.model}</span>
+      <ChevronDown size={14} />
+      <select
+        value={current.id}
+        onChange={(e) => choose(e.target.value)}
+        disabled={disabled}
+        aria-label={t("chatui.model")}
+        className="absolute inset-0 cursor-pointer opacity-0"
+      >
+        {engines.map((e) => (
+          <option key={e.id} value={e.id}>
+            {e.label}
+            {e.isDefault ? ` (${t("chatui.modelDefault")})` : ""}
           </option>
         ))}
       </select>

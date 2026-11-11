@@ -90,7 +90,7 @@ function VideoSuggestions({ videos }: { videos: LessonCard[] }) {
 }
 
 /** Quick answer for factual questions: the answer first, then more to know. */
-function AnswerCard({ m, onExplore, voice }: { m: TutorMessage; onExplore?: (q: string) => void; voice?: MessageVoice }) {
+function AnswerCard({ m, onExplore, voice, streaming }: { m: TutorMessage; onExplore?: (q: string) => void; voice?: MessageVoice; streaming?: boolean }) {
   const { t, n } = useT();
   const moreInfo = (m.meta.moreInfo as string[] | undefined) ?? [];
   const funFact = m.meta.funFact as string | undefined;
@@ -106,7 +106,7 @@ function AnswerCard({ m, onExplore, voice }: { m: TutorMessage; onExplore?: (q: 
           {voice && <SpeakButton voice={voice} light />}
         </div>
         <div className="relative mt-1 font-display text-xl font-bold leading-snug [&_.katex]:text-white [&_strong]:text-banana-300">
-          <Markdown>{m.content}</Markdown>
+          <Markdown className={clsx("prose-chat", streaming && "stream-cursor")}>{m.content}</Markdown>
         </div>
       </motion.div>
 
@@ -156,15 +156,18 @@ export function ChatMessage({
   compact = false,
   onExplore,
   voice,
+  streaming = false,
 }: {
   m: TutorMessage;
   compact?: boolean;
   onExplore?: (q: string) => void;
   /** read-aloud controls (Ask Progga only) */
   voice?: MessageVoice;
+  /** Progga is still writing this message: show a blinking caret after the last word */
+  streaming?: boolean;
 }) {
   const { t } = useT();
-  if (m.kind === "answer") return <AnswerCard m={m} onExplore={onExplore} voice={voice} />;
+  if (m.kind === "answer") return <AnswerCard m={m} onExplore={onExplore} voice={voice} streaming={streaming} />;
 
   if (m.role === "student") {
     return (
@@ -236,7 +239,7 @@ export function ChatMessage({
             {voice && <SpeakButton voice={voice} />}
           </div>
         )}
-        <Markdown>{m.content}</Markdown>
+        <Markdown className={clsx("prose-chat", streaming && "stream-cursor")}>{m.content}</Markdown>
         {Array.isArray(m.meta.videos) && m.meta.videos.length > 0 && <VideoSuggestions videos={m.meta.videos as LessonCard[]} />}
       </div>
     </motion.div>

@@ -4,12 +4,13 @@ import clsx from "clsx";
 import { CheckCircle2, CircleAlert, FlaskConical, Gauge, KeyRound, Save, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
+import { VoiceSettings } from "@/components/admin/VoiceSettings";
 import { ProggaBot, type BotMood } from "@/components/brand/ProggaBot";
 import { useCelebrate } from "@/components/celebrate/CelebrationProvider";
 import { ErrorNote, PageLoader, Spinner } from "@/components/ui/primitives";
 import { api, errorMessage } from "@/lib/api";
 
-type ProviderId = "openai" | "deepseek" | "anthropic" | "mock";
+type ProviderId = "openai" | "deepseek" | "anthropic" | "ollama" | "mock";
 
 interface ProviderInfo {
   id: ProviderId;
@@ -38,6 +39,7 @@ const PROVIDER_STYLE: Record<ProviderId, { icon: string; tint: string }> = {
   openai: { icon: "🟢", tint: "from-mint-50 to-white" },
   deepseek: { icon: "🐋", tint: "from-sky-50 to-white" },
   anthropic: { icon: "🟠", tint: "from-banana-50 to-white" },
+  ollama: { icon: "🦙", tint: "from-mint-50 to-white" },
   mock: { icon: "🧪", tint: "from-brand-50 to-white" },
 };
 
@@ -154,7 +156,7 @@ export default function AiSettingsPage() {
                 <p className="mt-2 font-display text-lg font-extrabold leading-tight">{p.label}</p>
                 <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-extrabold">
                   <span className={clsx("flex items-center gap-1 rounded-full px-2 py-0.5", p.configured ? "bg-mint-100 text-mint-700" : "bg-coral-100 text-coral-600")}>
-                    <KeyRound size={11} /> {p.id === "mock" ? "No key needed" : p.configured ? "Key found" : "No API key"}
+                    <KeyRound size={11} /> {p.id === "mock" ? "No key needed" : p.id === "ollama" ? (p.configured ? "Runs locally" : "Not set up") : p.configured ? "Key found" : "No API key"}
                   </span>
                   <span className="rounded-full bg-white px-2 py-0.5 text-ink-soft">{p.vision ? "📷 Photos" : "✏️ Text"}</span>
                 </div>
@@ -237,6 +239,9 @@ export default function AiSettingsPage() {
           )}
         </div>
       </section>
+
+      <hr className="border-line" />
+      <VoiceSettings />
     </div>
   );
 }

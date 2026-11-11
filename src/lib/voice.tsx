@@ -20,6 +20,7 @@ const BOOST = 3.2;
 // Progga is a kid: clips play slightly faster with pitch preservation off, which
 // raises both pitch and the voice's "size" (formants) like a child's. The voice is
 // asked to speak slowly (backend VOICE_STYLE), so the pace still sounds natural.
+// How much depends on the voice engine (from /health); the recorded reactions use this.
 const KID_LIFT = 1.12;
 
 interface VoiceCtx {
@@ -47,7 +48,8 @@ type Clip = { id: string | null; url: string };
 
 const Ctx = createContext<VoiceCtx | null>(null);
 
-const speechUrl = (sessionId: string, messageId: string) => `/api/tutor/sessions/${sessionId}/messages/${messageId}/speech`;
+// The browser keeps clips for a day: bump `v` with the backend's SPEECH_TEXT so changed speech isn't served stale.
+const speechUrl = (sessionId: string, messageId: string) => `/api/tutor/sessions/${sessionId}/messages/${messageId}/speech?v=options-1`;
 
 function readStore<T>(key: string, parse: (v: string) => T | undefined, fallback: T): T {
   try {
@@ -67,7 +69,7 @@ function writeStore(key: string, value: string) {
 }
 
 export function VoiceProvider({ children, onError }: { children: React.ReactNode; onError?: () => void }) {
-  const { voice: available } = useEngine();
+  const { voice: available, voiceLift } = useEngine();
   const [enabled, setEnabledState] = useState(false);
   const [toggles, setToggles] = useState(0);
   const [rate, setRateState] = useState<VoiceRate>(1);
@@ -79,6 +81,8 @@ export function VoiceProvider({ children, onError }: { children: React.ReactNode
   const queue = useRef<Clip[]>([]);
   const blobs = useRef(new Map<string, Promise<string | null>>());
   const rateRef = useRef<VoiceRate>(1);
+  const liftRef = useRef(voiceLift);
+  liftRef.current = voiceLift;
   const generation = useRef(0); // bumps on stop/replace so stale callbacks do nothing
 
   useEffect(() => {
@@ -140,7 +144,7 @@ export function VoiceProvider({ children, onError }: { children: React.ReactNode
     if (gen !== generation.current) return;
     el.src = cached ?? next.url;
     el.preservesPitch = false;
-    el.playbackRate = (next.id ? rateRef.current : 1) * KID_LIFT; // reactions ignore the speed setting
+    el.playbackRate = next.id ? rateRef.current * liftRef.current : KID_LIFT; // reactions ignore the speed setting
     el.onplaying = () => gen === generation.current && (setSpeakingId(next.id), setLoadingId(null));
     el.onended = () => gen === generation.current && void playNext();
     el.onerror = () => {
@@ -209,7 +213,7 @@ export function VoiceProvider({ children, onError }: { children: React.ReactNode
     setRateState(r);
     rateRef.current = r;
     writeStore(RATE_KEY, String(r));
-    if (audio.current) audio.current.playbackRate = r * KID_LIFT;
+    if (audio.current) audio.current.playbackRate = r * liftRef.current;
   }, []);
 
   // stop talking when leaving Ask Progga; free downloaded clips

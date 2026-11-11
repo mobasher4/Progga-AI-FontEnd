@@ -11,10 +11,13 @@ import { ChatHeader } from "@/components/chat/ChatHeader";
 import { useChatLayout } from "@/components/chat/ChatShell";
 import { ErrorNote, Spinner } from "@/components/ui/primitives";
 import { useT, type TKey } from "@/i18n";
-import { api, errorMessage } from "@/lib/api";
+import { ChatMessage } from "@/components/tutor/ChatMessage";
+import { apiStream, errorMessage } from "@/lib/api";
 import { GRADES } from "@/lib/format";
 import { paletteFor } from "@/lib/skins";
-import type { StartResult, Subject } from "@/lib/types";
+import { previewAsMessage } from "@/lib/tutor";
+import { storedEngine } from "@/lib/useEngine";
+import type { PreviewMessage, StartResult, Subject } from "@/lib/types";
 
 type Chapter = { title: string; topics: string[] };
 type Pick = { topic: string; chapter?: string };
@@ -38,6 +41,8 @@ export default function StartLesson() {
   const [busy, setBusy] = useState(false);
   const [line, setLine] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  // the lesson's opening, word by word, while the AI is still writing it
+  const [preview, setPreview] = useState<PreviewMessage[]>([]);
 
   const { data: subjectsData } = useSWR<{ subjects: Subject[] }>(`/subjects?grade=${grade}`);
   const {
@@ -73,8 +78,13 @@ export default function StartLesson() {
     setBusy(true);
     setLine(0);
     setError(null);
+    setPreview([]);
     try {
-      const res = await api<StartResult>("/tutor/lessons", { body: { grade, subject, topic: chosen.topic, chapter: chosen.chapter } });
+      const res = await apiStream<StartResult, PreviewMessage[]>(
+        "/tutor/lessons",
+        { body: { grade, subject, topic: chosen.topic, chapter: chosen.chapter, engine: storedEngine() } },
+        setPreview,
+      );
       if (res.blocked) {
         setError(res.message);
         setBusy(false);
@@ -87,6 +97,21 @@ export default function StartLesson() {
       setError(errorMessage(e));
       setBusy(false);
     }
+  }
+
+  if (busy && preview.length) {
+    return (
+      <>
+        <ChatHeader title={t("learn.title")} subtitle={chosen?.topic} />
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-3xl space-y-3 px-4 py-6 sm:px-6">
+            {preview.map((p, i) => (
+              <ChatMessage key={i} m={previewAsMessage(p, i)} streaming={i === preview.length - 1} />
+            ))}
+          </div>
+        </div>
+      </>
+    );
   }
 
   if (busy) {

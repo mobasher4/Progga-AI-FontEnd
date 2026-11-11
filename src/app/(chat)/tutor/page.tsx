@@ -10,16 +10,16 @@ import { ProggaBot, type BotMood } from "@/components/brand/ProggaBot";
 import { ChatComposer, type ComposerHandle } from "@/components/chat/ChatComposer";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { useChatLayout } from "@/components/chat/ChatShell";
-import { PhotoButton, PhotoPreview, SubjectPicker } from "@/components/chat/ComposerTools";
+import { EnginePicker, PhotoButton, PhotoPreview, SubjectPicker } from "@/components/chat/ComposerTools";
 import { ProggaMark } from "@/components/brand/Logo";
 import { ChatMessage } from "@/components/tutor/ChatMessage";
 import { ErrorNote } from "@/components/ui/primitives";
 import { useT, type TKey } from "@/i18n";
 import { errorMessage } from "@/lib/api";
 import { paletteFor } from "@/lib/skins";
-import { EXAMPLES, EXAMPLES_BN, startTutorSession } from "@/lib/tutor";
-import type { Subject } from "@/lib/types";
-import { useEngine } from "@/lib/useEngine";
+import { EXAMPLES, EXAMPLES_BN, previewAsMessage, startTutorSession } from "@/lib/tutor";
+import type { PreviewMessage, Subject } from "@/lib/types";
+import { useEngine, useEngineChoice } from "@/lib/useEngine";
 
 const PLANNING_LINES: TKey[] = ["ask.plan1", "ask.plan2", "ask.plan3", "ask.plan4"];
 
@@ -29,9 +29,13 @@ function NewChat() {
   const { user, refreshHistory } = useChatLayout();
   const { t, ui } = useT();
   const { mutate } = useSWRConfig();
-  const { vision } = useEngine();
+  const { vision: defaultVision } = useEngine();
+  const { current: engine } = useEngineChoice();
+  // photos only for a model that can read them
+  const vision = engine ? engine.vision : defaultVision;
   const { data: subjectsData } = useSWR<{ subjects: Subject[] }>(user.grade ? `/subjects?grade=${user.grade}` : null);
   const composer = useRef<ComposerHandle>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const [subject, setSubject] = useState(params.get("subject") ?? "math");
   const [question, setQuestion] = useState("");
@@ -41,6 +45,8 @@ function NewChat() {
   const [line, setLine] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [blocked, setBlocked] = useState<string | null>(null);
+  // Progga's opening, word by word, while the AI is still writing it
+  const [opening, setOpening] = useState<PreviewMessage[]>([]);
   const busy = !!sent && !blocked && !error;
 
   // "New question" from the sidebar → start fresh
@@ -54,6 +60,10 @@ function NewChat() {
     setError(null);
     composer.current?.focus();
   }, [fresh]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
+  }, [opening]);
 
   useEffect(() => {
     if (!busy) return;
@@ -77,9 +87,11 @@ function NewChat() {
     setError(null);
     setBlocked(null);
     setQuestion("");
+    setOpening([]);
     try {
-      const res = await startTutorSession(q, subject, image);
+      const res = await startTutorSession(q, subject, image, undefined, setOpening);
       if (res.blocked) {
+        setOpening([]);
         setBlocked(res.message);
         return;
       }
@@ -87,6 +99,7 @@ function NewChat() {
       refreshHistory();
       router.push(`/tutor/${res.session.id}?speak=1`);
     } catch (err) {
+      setOpening([]);
       setError(errorMessage(err));
       setQuestion(q);
     }
@@ -101,7 +114,7 @@ function NewChat() {
     <>
       <ChatHeader title={t("nav.ask")} subtitle={t("chatui.disclaimer")} />
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
         {!sent ? (
           <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col items-center justify-center px-4 py-8 text-center sm:px-6">
             <ProggaBot size={120} mood={mood} palette={palette} />
@@ -162,7 +175,8 @@ function NewChat() {
                 <img src={sent.photo} alt={t("ask.photoAlt")} className="h-32 rounded-2xl border border-line object-cover" />
               </div>
             )}
-            {busy && (
+            {busy && opening.map((p, i) => <ChatMessage key={i} m={previewAsMessage(p, i)} streaming={i === opening.length - 1} />)}
+            {busy && !opening.length && (
               <div className="flex items-center gap-3">
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50">
                   <ProggaMark size={28} />
@@ -202,6 +216,7 @@ function NewChat() {
           <>
             {vision && <PhotoButton onPick={pickImage} disabled={busy} />}
             {subjects.length > 0 && <SubjectPicker subjects={subjects} value={subject} onChange={setSubject} disabled={busy} />}
+            <EnginePicker disabled={busy} />
           </>
         }
       />

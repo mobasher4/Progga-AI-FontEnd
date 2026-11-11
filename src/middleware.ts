@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // Fast redirect for signed-out visitors. The API still verifies the token on
 // every request; this only avoids flashing a protected page.
-const PROTECTED = ["/home", "/tutor", "/lessons", "/arena", "/rewards", "/leaderboard", "/profile", "/guardian", "/admin"];
+const PROTECTED = ["/home", "/tutor", "/lessons", "/arena", "/battle", "/rewards", "/leaderboard", "/profile", "/guardian", "/admin"];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;

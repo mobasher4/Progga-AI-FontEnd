@@ -61,6 +61,18 @@
   --animate-wiggle: wiggle 0.5s ease-in-out;
   --animate-pop: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   --animate-soundbar: soundbar 0.9s ease-in-out infinite;
+  --animate-option-glow: option-glow 2.4s ease-in-out infinite;
+  --animate-tap: tap 1.4s ease-in-out infinite;
+
+  /* answer choices breathe a soft blue glow so students see they can tap them */
+  @keyframes option-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgb(43 123 232 / 0); }
+    50% { box-shadow: 0 0 0 3px rgb(43 123 232 / 0.22), 0 6px 20px -4px rgb(43 123 232 / 0.45); }
+  }
+  @keyframes tap {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(2px, 2px) scale(0.88); }
+  }
 
   @keyframes float {
     0%, 100% { transform: translateY(0); }
@@ -172,4 +184,156 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Progga's words arriving as the AI writes them: a soft blinking caret after the last one */
+.stream-cursor > :last-child::after {
+  content: "";
+  display: inline-block;
+  width: 0.45em;
+  height: 1.05em;
+  margin-left: 3px;
+  vertical-align: -0.15em;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.4;
+  animation: stream-caret 1s steps(2, start) infinite;
+}
+@keyframes stream-caret {
+  to { visibility: hidden; }
+}
+
+/* ── Battle Arena ─────────────────────────────────────────
+   Night-sky arena, glossy candy buttons, clouds and radar for matchmaking. */
+.battle-sky {
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgb(124 58 237 / 0.55), transparent 60%),
+    radial-gradient(900px 500px at 100% 110%, rgb(236 72 153 / 0.35), transparent 60%),
+    radial-gradient(900px 500px at 0% 100%, rgb(14 165 233 / 0.35), transparent 60%),
+    linear-gradient(180deg, #120b3a 0%, #1b1060 45%, #0b1b4a 100%);
+}
+.battle-stars {
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 30%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 70% 20%, #fff 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 40% 80%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 85% 65%, #fff 50%, transparent 51%),
+    radial-gradient(1.4px 1.4px at 10% 70%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 55% 50%, #fff 50%, transparent 51%);
+  background-size: 260px 260px;
+  animation: twinkle 4s ease-in-out infinite alternate;
+}
+@keyframes twinkle { from { opacity: 0.35; } to { opacity: 0.9; } }
+
+/* Glossy "candy" game button: gradient body, top shine, chunky bottom edge */
+.btn-glossy {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  border-radius: 1.4rem;
+  padding: 1rem 2rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #fff;
+  text-shadow: 0 2px 0 rgb(0 0 0 / 0.25);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.15s ease;
+  user-select: none;
+}
+.btn-glossy::before {
+  content: "";
+  position: absolute;
+  inset: 3px 6px auto 6px;
+  height: 45%;
+  border-radius: 1.1rem 1.1rem 50% 50% / 1.1rem 1.1rem 30% 30%;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.05));
+  z-index: -1;
+  pointer-events: none;
+}
+.btn-glossy:hover { filter: brightness(1.07) saturate(1.05); }
+.btn-glossy:active { transform: translateY(4px); }
+.btn-glossy:disabled { opacity: 0.55; pointer-events: none; }
+.btn-glossy-orange {
+  background: linear-gradient(180deg, #ffd166 0%, #ff9f1c 55%, #f77f00 100%);
+  box-shadow: 0 6px 0 #b85a00, 0 14px 30px -8px rgb(247 127 0 / 0.7), inset 0 -3px 0 rgb(0 0 0 / 0.12);
+}
+.btn-glossy-orange:active { box-shadow: 0 2px 0 #b85a00, 0 6px 14px -6px rgb(247 127 0 / 0.7); }
+.btn-glossy-green {
+  background: linear-gradient(180deg, #8af5c8 0%, #22c493 55%, #12936c 100%);
+  box-shadow: 0 6px 0 #0b6b4e, 0 14px 30px -8px rgb(34 196 147 / 0.6), inset 0 -3px 0 rgb(0 0 0 / 0.12);
+}
+.btn-glossy-green:active { box-shadow: 0 2px 0 #0b6b4e; }
+.btn-glossy-blue {
+  background: linear-gradient(180deg, #8cc4ff 0%, #2b7be8 55%, #1a4fab 100%);
+  box-shadow: 0 6px 0 #133a80, 0 14px 30px -8px rgb(43 123 232 / 0.6), inset 0 -3px 0 rgb(0 0 0 / 0.12);
+}
+.btn-glossy-blue:active { box-shadow: 0 2px 0 #133a80; }
+.btn-glossy-red {
+  background: linear-gradient(180deg, #ff9a9a 0%, #ff5c5c 55%, #d93636 100%);
+  box-shadow: 0 6px 0 #962020, 0 14px 30px -8px rgb(255 92 92 / 0.6), inset 0 -3px 0 rgb(0 0 0 / 0.12);
+}
+.btn-glossy-red:active { box-shadow: 0 2px 0 #962020; }
+.btn-glossy-glass {
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0.08));
+  box-shadow: 0 4px 0 rgb(0 0 0 / 0.25), inset 0 0 0 1.5px rgb(255 255 255 / 0.25);
+  backdrop-filter: blur(8px);
+}
+
+/* light sweep that passes over shiny things */
+.shine { position: relative; overflow: hidden; }
+.shine::after {
+  content: "";
+  position: absolute;
+  inset: -50% auto -50% -60%;
+  width: 40%;
+  transform: rotate(20deg);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.45), transparent);
+  animation: shine-sweep 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes shine-sweep { 0%, 55% { left: -60%; } 100% { left: 140%; } }
+
+/* matchmaking clouds */
+@keyframes cloud-drift { from { transform: translateX(-30vw); } to { transform: translateX(130vw); } }
+.cloud {
+  position: absolute;
+  border-radius: 999px;
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.95), rgb(226 232 255 / 0.85) 70%, rgb(226 232 255 / 0));
+  filter: blur(2px);
+  animation: cloud-drift linear infinite;
+}
+.cloud::before, .cloud::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  background: inherit;
+}
+.cloud::before { width: 60%; height: 120%; left: 12%; top: -55%; }
+.cloud::after { width: 45%; height: 95%; right: 10%; top: -35%; }
+
+@keyframes radar-sweep { to { transform: rotate(360deg); } }
+.radar-sweep {
+  background: conic-gradient(from 0deg, rgb(255 212 59 / 0.55), rgb(255 212 59 / 0) 70deg, transparent 360deg);
+  animation: radar-sweep 1.6s linear infinite;
+}
+@keyframes ring-pulse { 0% { transform: scale(0.6); opacity: 0.9; } 100% { transform: scale(1.6); opacity: 0; } }
+.ring-pulse { animation: ring-pulse 1.8s ease-out infinite; }
+
+@keyframes battle-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(9px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(4px); }
+}
+.battle-shake { animation: battle-shake 0.45s ease-in-out; }
+
+@keyframes rays-spin { to { transform: rotate(360deg); } }
+.victory-rays {
+  background: repeating-conic-gradient(from 0deg, rgb(255 222 89 / 0.32) 0deg 10deg, transparent 10deg 24deg);
+  animation: rays-spin 18s linear infinite;
+  mask-image: radial-gradient(circle, #000 25%, transparent 68%);
 }

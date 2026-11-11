@@ -2,7 +2,9 @@
 
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Heart, RotateCcw, Timer, Zap } from "lucide-react";
+import { ArrowRight, Heart, RotateCcw, Swords, Timer, Zap } from "lucide-react";
+import Link from "next/link";
+import { SwordsIcon } from "@/components/battle/art";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 import { ProggaBot } from "@/components/brand/ProggaBot";
@@ -97,6 +99,8 @@ export default function ArenaPage() {
           )}
         </div>
       </section>
+
+      <BattleCta />
 
       <section>
         <h2 className="mb-4 text-2xl font-extrabold">{t("arena.choose")}</h2>
@@ -309,6 +313,30 @@ function Results({ game, result, onExit, onReplay }: { game: Game; result: Answe
           <button onClick={onExit} className="btn-ghost flex-1">{t("arena.change")}</button>
         </div>
       </div>
+      <div className="mt-5">
+        <BattleCta />
+      </div>
     </div>
+  );
+}
+
+/** After practising solo, invite the student to battle a real classmate. */
+function BattleCta() {
+  const { t } = useT();
+  return (
+    <Link
+      href="/battle"
+      className="battle-sky group relative flex flex-col items-center gap-4 overflow-hidden rounded-[2rem] p-5 text-white shadow-lift transition-transform hover:-translate-y-1 sm:flex-row sm:p-6"
+    >
+      <div className="battle-stars pointer-events-none absolute inset-0" />
+      <SwordsIcon size={72} className="relative shrink-0 transition-transform group-hover:rotate-6 group-hover:scale-110" />
+      <div className="relative flex-1 text-center sm:text-left">
+        <p className="font-display text-2xl font-extrabold">{t("battle.cta")}</p>
+        <p className="text-indigo-100/90">{t("battle.ctaText")}</p>
+      </div>
+      <span className="btn-glossy btn-glossy-orange shine relative px-6 py-3 text-lg">
+        <Swords size={20} strokeWidth={2.6} /> {t("battle.ctaBtn")}
+      </span>
+    </Link>
   );
 }
