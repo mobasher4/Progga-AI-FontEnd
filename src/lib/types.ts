@@ -31,10 +31,15 @@ export interface LevelInfo {
 export interface User {
   id: string;
   name: string;
-  email: string;
+  email: string | null;
+  phone?: string | null;
   role: Role;
   grade: number | null;
+  birthdate?: string | null;
   language: Language;
+  photoUrl?: string | null;
+  profile?: Profile;
+  profileStatus?: ProfileStatus;
   avatarSkin?: string;
   skin?: Skin;
   coins?: number;
@@ -43,6 +48,34 @@ export interface User {
   linkCode?: string;
   dailyTutorLimit?: number;
   level?: LevelInfo;
+  /** Set when a parent opened this kid's profile on this device. */
+  switchedFrom?: { name: string } | null;
+}
+
+export const RELATIONS = ["father", "mother", "brother", "sister", "uncle", "aunt", "grandparent", "other"] as const;
+export type Relation = (typeof RELATIONS)[number];
+
+/** The "About me" part of an account (see backend modules/users/profile.ts). */
+export interface Profile {
+  bio?: string;
+  dream?: string;
+  schoolName?: string;
+  district?: string;
+  fatherName?: string;
+  motherName?: string;
+  guardianName?: string;
+  guardianRelation?: Relation;
+  guardianPhone?: string;
+  relation?: Relation;
+  occupation?: string;
+  subjects?: string;
+}
+
+export interface ProfileStatus {
+  percent: number;
+  /** checklist ids still missing: photo, bio, school, guardian… */
+  missing: string[];
+  rewarded?: boolean;
 }
 
 export interface Badge {

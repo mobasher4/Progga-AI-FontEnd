@@ -5,6 +5,7 @@ import Link from "next/link";
 import useSWR from "swr";
 import { ProggaBot } from "@/components/brand/ProggaBot";
 import { LessonTile, QuestRow, SessionRow } from "@/components/cards";
+import { ProfileCompletionCard } from "@/components/profile/ProfileCompletionCard";
 import { EmptyState, PageLoader, ProgressBar, SectionTitle, SubjectIcon } from "@/components/ui/primitives";
 import { useFormat, useT } from "@/i18n";
 import { firstName } from "@/lib/format";
@@ -50,6 +51,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <ProfileCompletionCard user={user} href="/profile" />
 
       {/* Stats */}
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">

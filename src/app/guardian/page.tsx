@@ -1,24 +1,26 @@
 "use client";
 
-import { AlertTriangle, ArrowRight, Link2 } from "lucide-react";
+import { AlertTriangle, ArrowRight, Link2, Play } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
 import { ProggaBot } from "@/components/brand/ProggaBot";
 import { useCelebrate } from "@/components/celebrate/CelebrationProvider";
+import { Avatar } from "@/components/profile/Avatar";
+import { ProfileCompletionCard } from "@/components/profile/ProfileCompletionCard";
 import { ErrorNote, PageLoader, ProgressBar, Spinner } from "@/components/ui/primitives";
 import { useFormat, useT } from "@/i18n";
 import { api, errorMessage } from "@/lib/api";
 import { firstName } from "@/lib/format";
-import { paletteFor } from "@/lib/skins";
 import type { LevelInfo } from "@/lib/types";
-import { useMe } from "@/lib/useMe";
+import { useMe, useSwitchProfile } from "@/lib/useMe";
 
 interface StudentSummary {
   id: string;
   name: string;
   grade: number;
   avatarSkin: string;
+  photoUrl: string | null;
   level: LevelInfo;
   streak: number;
   lastActive: string | null;
@@ -36,6 +38,8 @@ export default function GuardianHome() {
   const [code, setCode] = useState("");
   const [linking, setLinking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [opening, setOpening] = useState<string | null>(null);
+  const switchProfile = useSwitchProfile();
 
   async function link(e: React.FormEvent) {
     e.preventDefault();
@@ -64,14 +68,15 @@ export default function GuardianHome() {
         <p className="mt-1 max-w-2xl text-ink-soft">{t("guardian.intro")}</p>
       </div>
 
+      {user && <ProfileCompletionCard user={user} href="/guardian/profile" />}
+
       {data.students.length > 0 && (
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {data.students.map((s) => (
-            <Link key={s.id} href={`/guardian/${s.id}`} className="card group p-5 transition-all hover:-translate-y-1 hover:shadow-lift">
+            <div key={s.id} className="card flex flex-col transition-all hover:-translate-y-1 hover:shadow-lift">
+            <Link href={`/guardian/${s.id}`} className="group block flex-1 p-5 pb-4">
               <div className="flex items-center gap-4">
-                <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-cream">
-                  <ProggaBot size={52} palette={paletteFor(s.avatarSkin)} float={false} />
-                </span>
+                <Avatar name={s.name} photoUrl={s.photoUrl} role="STUDENT" skin={s.avatarSkin} size={64} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-display text-xl font-extrabold">{s.name}</p>
                   <p className="text-sm text-ink-muted">{gradeLabel(s.grade)} · {t("common.levelN", { n: s.level.level })}</p>
@@ -93,6 +98,22 @@ export default function GuardianHome() {
                 {t("guardian.lastActive", { d: s.lastActive ? date(`${s.lastActive}T12:00:00`) : t("guardian.notYet") })}
               </p>
             </Link>
+            {!teacher && (
+              <button
+                onClick={() => {
+                  setOpening(s.id);
+                  switchProfile.to(s.id).catch((err) => {
+                    setError(errorMessage(err));
+                    setOpening(null);
+                  });
+                }}
+                disabled={!!opening}
+                className="mx-5 mb-5 flex items-center justify-center gap-2 rounded-2xl bg-brand-50 py-2.5 font-display font-bold text-brand-600 transition-colors hover:bg-brand-100"
+              >
+                {opening === s.id ? <Spinner size={18} /> : <><Play size={16} fill="currentColor" /> {t("onboard.learnAs", { name: firstName(s.name) })}</>}
+              </button>
+            )}
+            </div>
           ))}
         </div>
       )}

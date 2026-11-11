@@ -7,14 +7,17 @@ import { use, useState } from "react";
 import useSWR from "swr";
 import { ProggaBot } from "@/components/brand/ProggaBot";
 import { useCelebrate } from "@/components/celebrate/CelebrationProvider";
+import { Avatar } from "@/components/profile/Avatar";
+import { ProfileFacts } from "@/components/profile/ProfileEditor";
 import { PageLoader, ProgressBar, SectionTitle } from "@/components/ui/primitives";
 import { useFormat, useT, type TKey } from "@/i18n";
 import { api, errorMessage } from "@/lib/api";
+import { firstName } from "@/lib/format";
 import { paletteFor } from "@/lib/skins";
-import type { LevelInfo } from "@/lib/types";
+import type { LevelInfo, Profile, ProfileStatus } from "@/lib/types";
 
 interface Report {
-  student: { id: string; name: string; grade: number; avatarSkin: string; level: LevelInfo; streak: number; bestStreak: number; dailyTutorLimit: number; badges: number };
+  student: { id: string; name: string; grade: number; avatarSkin: string; photoUrl?: string | null; profile?: Profile; profileStatus?: ProfileStatus; level: LevelInfo; streak: number; bestStreak: number; dailyTutorLimit: number; badges: number };
   week: { day: string; xp: number }[];
   tutor: {
     sessions: number;
@@ -70,9 +73,13 @@ export default function StudentReport({ params }: { params: Promise<{ studentId:
       </Link>
 
       <div className="card flex flex-col gap-5 p-6 sm:flex-row sm:items-center">
-        <span className="grid h-24 w-24 shrink-0 place-items-center rounded-3xl bg-cream">
-          <ProggaBot size={78} palette={paletteFor(s.avatarSkin)} mood="happy" float={false} />
-        </span>
+        {s.photoUrl ? (
+          <Avatar name={s.name} photoUrl={s.photoUrl} size={96} />
+        ) : (
+          <span className="grid h-24 w-24 shrink-0 place-items-center rounded-3xl bg-cream">
+            <ProggaBot size={78} palette={paletteFor(s.avatarSkin)} mood="happy" float={false} />
+          </span>
+        )}
         <div className="flex-1">
           <h1 className="text-3xl font-extrabold">{s.name}</h1>
           <p className="text-ink-soft">
@@ -84,6 +91,16 @@ export default function StudentReport({ params }: { params: Promise<{ studentId:
           <Kpi value={n(s.level.xp)} label={t("report.totalXp")} />
         </div>
       </div>
+
+      {s.profile && Object.values(s.profile).some(Boolean) && (
+        <div className="card p-6">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-xl font-extrabold">{t("me.aboutKid", { name: firstName(s.name) })}</h2>
+            {s.profileStatus && <span className="rounded-full bg-cream px-3 py-1 text-xs font-extrabold text-ink-muted">{t("me.percentDone", { n: s.profileStatus.percent })}</span>}
+          </div>
+          <ProfileFacts profile={s.profile} />
+        </div>
+      )}
 
       {alerts.length > 0 && (
         <div className="rounded-3xl border-2 border-coral-100 bg-coral-50 p-5">

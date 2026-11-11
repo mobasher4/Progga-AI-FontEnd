@@ -28,3 +28,22 @@ export function useLogout() {
     router.refresh();
   };
 }
+
+/**
+ * Parent ⇄ kid profile switching on one device. `to(kidId)` opens a kid's
+ * profile; `back()` returns to the parent who opened it.
+ */
+export function useSwitchProfile() {
+  const router = useRouter();
+  const { mutate } = useSWRConfig();
+  const go = async (path: string, dest: string) => {
+    await api(path, { method: "POST" });
+    // everything cached belongs to the previous profile
+    await mutate(() => true, undefined, { revalidate: false });
+    router.replace(dest);
+  };
+  return {
+    to: (kidId: string) => go(`/guardian/students/${kidId}/switch`, "/home"),
+    back: () => go("/auth/switch-back", "/guardian"),
+  };
+}

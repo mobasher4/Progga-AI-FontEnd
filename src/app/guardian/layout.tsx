@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Avatar } from "@/components/profile/Avatar";
 import { PageLoader } from "@/components/ui/primitives";
 import { useSyncAccountLanguage, useT } from "@/i18n";
 import { useLogout, useMe } from "@/lib/useMe";
@@ -35,8 +36,14 @@ export default function GuardianLayout({ children }: { children: React.ReactNode
             </span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="hidden font-display font-bold text-ink-soft lg:inline">{user.name}</span>
             <LanguageSwitcher />
+            <Link href="/guardian/profile" className="flex items-center gap-2.5 rounded-2xl p-1 pr-1 transition-colors hover:bg-cream lg:pr-3" aria-label={t("me.myProfile")}>
+              <span className="relative">
+                <Avatar name={user.name} photoUrl={user.photoUrl} role={user.role} size={38} />
+                {(user.profileStatus?.percent ?? 100) < 100 && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-banana-400 ring-2 ring-white" />}
+              </span>
+              <span className="hidden font-display font-bold text-ink-soft lg:inline">{user.name}</span>
+            </Link>
             <button onClick={logout} className="btn-ghost btn-sm"><LogOut size={15} /> <span className="hidden sm:inline">{t("common.logout")}</span></button>
           </div>
         </div>

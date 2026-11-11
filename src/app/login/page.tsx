@@ -54,8 +54,8 @@ function LoginForm() {
     <>
       <form onSubmit={login} className="space-y-4">
         <div>
-          <label className="label" htmlFor="email">{t("auth.email")}</label>
-          <input id="email" className="input" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
+          <label className="label" htmlFor="email">{t("auth.contact")}</label>
+          <input id="email" className="input" inputMode="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t("auth.contactPh")} />
         </div>
         <div>
           <label className="label" htmlFor="password">{t("auth.password")}</label>

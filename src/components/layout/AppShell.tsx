@@ -1,18 +1,20 @@
 "use client";
 
 import clsx from "clsx";
-import { Bot, Crown, Home, LogOut, PlayCircle, Swords, Trophy, UserRound, Zap } from "lucide-react";
+import { ArrowLeftRight, Bot, Crown, Home, LogOut, PlayCircle, Swords, Trophy, UserRound, Zap } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ProggaBot } from "@/components/brand/ProggaBot";
 import { Logo } from "@/components/brand/Logo";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Avatar } from "@/components/profile/Avatar";
 import { PageLoader } from "@/components/ui/primitives";
 import { useFormat, useSyncAccountLanguage, useT, type TKey } from "@/i18n";
 import { homeFor } from "@/lib/routes";
 import { paletteFor } from "@/lib/skins";
-import { useLogout, useMe } from "@/lib/useMe";
+import { firstName } from "@/lib/format";
+import { useLogout, useMe, useSwitchProfile } from "@/lib/useMe";
 import type { User } from "@/lib/types";
 
 const NAV: { href: string; label: TKey; short?: TKey; icon: typeof Home; hot?: boolean }[] = [
@@ -79,7 +81,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
         <div className="rounded-3xl bg-gradient-to-br from-brand-500 to-brand-700 p-4 text-white">
           <div className="flex items-center gap-3">
-            <ProggaBot size={46} float={false} palette={user.skin?.palette ?? paletteFor(user.avatarSkin)} />
+            {user.photoUrl ? (
+              <Avatar name={user.name} photoUrl={user.photoUrl} size={46} className="ring-2 ring-white/40" />
+            ) : (
+              <ProggaBot size={46} float={false} palette={user.skin?.palette ?? paletteFor(user.avatarSkin)} />
+            )}
             <div className="min-w-0">
               <p className="truncate font-display font-bold leading-tight">{user.name}</p>
               <p className="text-xs text-brand-100">{gradeLabel(user.grade)}</p>
@@ -92,6 +98,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="lg:pl-64">
+        {user.switchedFrom && <SwitchedBar kid={user.name} parent={user.switchedFrom.name} />}
         <TopBar user={user} />
         <main className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:pb-12">{children}</main>
       </div>
@@ -143,13 +150,42 @@ function TopBar({ user }: { user: User }) {
           <Stat icon="🍌" value={n(user.coins ?? 0)} label={t("home.coins", { n: user.coins ?? 0 })} className="hidden bg-banana-100 text-banana-700 sm:flex" />
           <LanguageSwitcher compact />
           <Link href="/profile" className="ml-0.5 hidden sm:block" aria-label={t("nav.profile")}>
-            <span className="grid h-11 w-11 place-items-center overflow-hidden rounded-2xl border-2 border-line bg-white">
-              <ProggaBot size={34} float={false} palette={user.skin?.palette ?? paletteFor(user.avatarSkin)} />
+            <span className="relative block">
+              {user.photoUrl ? (
+                <Avatar name={user.name} photoUrl={user.photoUrl} size={44} className="border-2 border-line" />
+              ) : (
+                <span className="grid h-11 w-11 place-items-center overflow-hidden rounded-2xl border-2 border-line bg-white">
+                  <ProggaBot size={34} float={false} palette={user.skin?.palette ?? paletteFor(user.avatarSkin)} />
+                </span>
+              )}
+              {(user.profileStatus?.percent ?? 100) < 100 && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-banana-400 ring-2 ring-cream" />}
             </span>
           </Link>
         </div>
       </div>
     </header>
+  );
+}
+
+/** Shown while a parent has a kid's profile open on this device. */
+function SwitchedBar({ kid, parent }: { kid: string; parent: string }) {
+  const { t } = useT();
+  const { back } = useSwitchProfile();
+  const [busy, setBusy] = useState(false);
+  return (
+    <div className="flex items-center justify-center gap-3 bg-banana-100 px-4 py-2 text-sm font-bold text-banana-700">
+      <span className="truncate">{t("onboard.learningAs", { name: firstName(kid) })}</span>
+      <button
+        onClick={() => {
+          setBusy(true);
+          back().catch(() => setBusy(false));
+        }}
+        disabled={busy}
+        className="flex shrink-0 items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-ink shadow-soft hover:bg-banana-50"
+      >
+        <ArrowLeftRight size={14} /> {t("onboard.backTo", { name: firstName(parent) })}
+      </button>
+    </div>
   );
 }
 

@@ -172,6 +172,13 @@
 .prose-lesson .katex { font-size: 1.08em; }
 .prose-lesson .katex-display { @apply my-3 overflow-x-auto overflow-y-hidden py-1; }
 
+/* A profile field jumped to from "Still to add": a soft highlight that fades */
+.field-flash { animation: field-flash 1.8s ease-out; border-radius: 1rem; }
+@keyframes field-flash {
+  0%, 25% { box-shadow: 0 0 0 6px rgb(255 212 59 / 0.55); background-color: rgb(255 243 196 / 0.6); }
+  100% { box-shadow: 0 0 0 6px rgb(255 212 59 / 0); background-color: transparent; }
+}
+
 /* Subtle dotted canvas used on hero / tutor backgrounds */
 .bg-dots {
   background-image: radial-gradient(rgb(43 123 232 / 0.12) 1.2px, transparent 1.2px);
